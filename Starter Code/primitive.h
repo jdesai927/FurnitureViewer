@@ -6,6 +6,7 @@ class Primitive {
 
 public:
 	float* vbo;
+	float* height;
 	short int* ibo;
 	float* cbo;
 	float* nbo;
@@ -16,7 +17,7 @@ public:
 	//virtual float* generateIBO() = 0;
 	//virtual float* generateCBO() = 0;
 	int* kind;
-	Primitive(int);
+	Primitive(float, int);
 	~Primitive();
 
 };

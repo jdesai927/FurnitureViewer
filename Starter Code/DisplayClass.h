@@ -43,6 +43,8 @@ public: // public methods
 	Sphere* sphere;
 	Cylinder* cylinder;
 	glm::vec3* lightPos;
+	glm::vec3* lightCol;
+	glm::vec3* ambientCol;
 	Node* selectedNode;
 
 	void resizeWindow(int w, int h);
@@ -70,6 +72,9 @@ private: // private members
 	unsigned int u_modelMatrixLocation;
 	unsigned int u_projMatrixLocation;
 	unsigned int u_lightPosLocation;
+	unsigned int u_lightColLocation;
+	unsigned int u_cameraPosLocation;
+	unsigned int u_ambientColLocation;
 
 	//needed to compile and link and use the shaders
 	unsigned int vertexShader;

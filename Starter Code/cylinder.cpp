@@ -2,7 +2,7 @@
 
 #define M_PI 3.1415926
 
-Cylinder::Cylinder() : Primitive(1) {
+Cylinder::Cylinder() : Primitive(0, 1) {
 	numIbo = new int(22);
 	numInds = new int(11);
 	numVbo = new int(132);
@@ -50,9 +50,11 @@ void Cylinder::generateVBO() {
 	for(int i=0; i<=sides; i++) {
 		const float nf = 1./sqrt(x2*x2+z2*z2),
 			xn = x2*nf, zn = z2*nf;
-		nbo[a] = xn;
+		glm::vec3 myvec(xn, 0.0f, zn);
+		myvec = glm::normalize(myvec);
+		nbo[a] = myvec.x;
 		nbo[a + 1] = 0.0f;
-		nbo[a + 2] = zn;
+		nbo[a + 2] = myvec.z;
 		nbo[a + 3] = 0.0f;
 		a += 4;
 		cbo[col] = 0.0f;
@@ -73,9 +75,11 @@ void Cylinder::generateVBO() {
 		nbo[m + 3] = 0.0f;
 		m += 4;
 		b += 4;
-		nbo[a] = xn;
+		myvec = glm::vec3(xn, 0.0f, zn);
+		myvec = glm::normalize(myvec);
+		nbo[a] = myvec.x;
 		nbo[a + 1] = 0.0f;
-		nbo[a + 2] = zn;
+		nbo[a + 2] = myvec.z;
 		nbo[a + 3] = 0.0f;
 		a += 4;
 		cbo[col] = 0.0f;

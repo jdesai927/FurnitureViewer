@@ -1,5 +1,5 @@
-I've completed all parts of the assignment, including the extra credit.
-HW2 Scene 2.txt shows an example of my usage of multitable (which is a 1x2 multitable). In this file I've shown my scenegraph can also handle stacked multitables.
-Interactivity is implemented as per the homework guidelines, all instructed key controls are working perfectly.
-Deleting the root node causes the program to exit, as does the escape key. Deleting any other node resets the traversal.
-The geometry at the currently selected node is drawn in white.
+I've completed all parts of the assignment, but have not implemented texturing. I've included
+as an "interesting" mesh the file "mysurfrev1.txt", which is a unicorn horn.
+Everything else about the assignment is as per the writeup and the same as before.
+See "README.txt" inside the "Starter Code" folder for details on the operation of the program
+(it's the same as the readme for homework 2).

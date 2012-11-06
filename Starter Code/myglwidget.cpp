@@ -1,5 +1,6 @@
 // codebit written by Tiantian Liu @ University of Pennsylvania, 2012
 #include "MyGLWidget.h"
+#include "mesh.h"
 
 
 # pragma region constructors and destructos
@@ -46,6 +47,7 @@ extern char* filename;
 void MyGLWidget::initializeGL() {
 	displayClass = new DisplayClass();
 	std::ifstream config;
+	std::ifstream meshfile;
 	config.open(filename);
 	std::string reader;
 	getline(config, reader);
@@ -62,7 +64,7 @@ void MyGLWidget::initializeGL() {
 		grid.push_back(col);
 	}
 	int i = 0;
-	glm::vec4 origin(((float) xSize)/-2.0f, 0.0f, ((float) zSize)/-2.0f, 1.0f);
+	glm::vec4 origin(((float) xSize)/-2.0f, -0.1f, ((float) zSize)/-2.0f, 1.0f);
 	displayClass->graph = new SceneGraph();
 	displayClass->floor = new Prism(1, xSize, 0.1f, -1 * zSize, origin);
 	SceneGraph* sg = displayClass->graph;
@@ -70,7 +72,7 @@ void MyGLWidget::initializeGL() {
 	sg->rootNode->scale = new glm::mat4();//glm::scale(glm::mat4(), glm::vec3(xSize, 0.1f, zSize)));
 	sg->rootNode->rotate = new glm::mat4();
 	sg->rootNode->translate = new glm::mat4();
-	Furniture* currentPrimitive;
+	Furniture* currentPrimitive = NULL;
 	Node* par;
 	glm::mat4 transl;
 	glm::mat4 rot;
@@ -80,9 +82,13 @@ void MyGLWidget::initializeGL() {
 	float* yi;
 	int zi;
 	std::string myName;
+	std::string meshparse;
 	while (i < numItems) {
+		currentPrimitive = NULL;
+		Mesh* myMesh = NULL;
 		getline(config, reader);
 		getline(config, reader);
+		myName = reader;
 		if (reader == "table") {
 			currentPrimitive = new Table();
 		} else if (reader == "chair") {
@@ -97,9 +103,48 @@ void MyGLWidget::initializeGL() {
 			/*for (int n = 0; n < currentPrimitive->localTransforms->size(); n++) {
 				*currentPrimitive->localTransforms->at(n) = glm::translate(glm::mat4(), glm::vec3(0.5f, 0.0f, 0.0f)) * *currentPrimitive->localTransforms->at(n);
 			}*/
+		} else if (reader == "mesh") {
+			getline(config, reader);
+			meshfile.open(reader);
+			getline(meshfile, meshparse);
+			if (meshparse == "extrusion") {
+				getline(meshfile, meshparse);
+				vec = getVec(meshparse);
+				float len = vec.x;
+				getline(meshfile, meshparse);
+				vec = getVec(meshparse);
+				int numVerts = vec.x;
+				std::vector<glm::vec3> verts;
+				for (int w = 0; w < numVerts; w++) {
+					getline(meshfile, meshparse);
+					vec = getVec(meshparse);
+					glm::vec3 myvec(vec.x, 0.0f, vec.y);
+					verts.push_back(myvec);
+				}
+				myMesh = new Mesh(len, numVerts, verts);
+			} else if (meshparse == "surfrev") {
+				getline(meshfile, meshparse);
+				vec = getVec(meshparse);
+				int numSlices = vec.x;
+				getline(meshfile, meshparse);
+				vec = getVec(meshparse);
+				int numVerts = vec.x;
+				std::vector<glm::vec4> verts;
+				for (int w = 0; w < numVerts; w++) {
+					getline(meshfile, meshparse);
+					vec = getVec(meshparse);
+					if (vec.x < 0) {
+						std::cerr << "Error: negative x value in surfrev" << std::endl;
+						exit(1);
+					}
+					glm::vec4 myvec(vec.x, vec.y, 0.0f, 1.0f);
+					verts.push_back(myvec);
+				}
+				myMesh = new Mesh(numSlices, numVerts, verts);
+			}
+			meshfile.close();
 		}
 
-		myName = reader;
 		//colors
 		getline(config, reader);
 
@@ -121,21 +166,24 @@ void MyGLWidget::initializeGL() {
 		scal = glm::scale(glm::mat4(), vec);
 		
 		thisNode = new Node(NULL, currentPrimitive, NULL, xi, zi);
+		if (myName == "mesh") {
+			thisNode->shape = myMesh;
+			if (*myMesh->kind == 99) {
+				//*yi = *myMesh->height/2.0f;
+			} else if (*myMesh->kind == 100) {
+				//*yi = *myMesh->height/2.0f;
+			}
+		}
 		par = sg->rootNode;
 		if (grid.at(xi).at(zi) != NULL) {
 			par = grid.at(xi).at(zi);
-			*yi = *par->furniture->height;
-			/*for (int i = 0; i < par->children->size(); i++) {
-				if (*par->children->at(i)->xInd == xi && *par->children->at(i)->zInd == zi) {
-					par = par->children->at(i);
-					*yi = *par->furniture->height;
-					if (par->children->size() > 0) {
-						par = setPar(thisNode, par, xi, yi, zi);
-						break;
-					}
-					break;
+			if (par->furniture == NULL) {
+				if (par != sg->rootNode) {
+					*yi += *par->shape->height;
 				}
-			}*/
+			} else {
+				*yi += *par->furniture->height;
+			}
 		}
 		thisNode->parent = par;
 	    grid.at(xi).at(zi) = thisNode;
@@ -144,14 +192,29 @@ void MyGLWidget::initializeGL() {
 		}
 
 		//setPar(par, myPar, xi, yi, zi);
-		transl = glm::translate(glm::mat4(), glm::vec3(xi + origin.x, *yi, zi + origin.z));
+		transl = glm::translate(glm::mat4(), glm::vec3(xi + origin.x + 0.5, *yi, zi + origin.z + 0.5));
 		if (myName == "multitable") {
 			transl = glm::translate(glm::mat4(), glm::vec3(0.5f, 0.0f, 0.0f)) * transl;
 		}
-
-		*thisNode->furniture->height *= scal[1][1];
+		if (thisNode->furniture != NULL) {
+			*thisNode->furniture->height *= scal[1][1];
+		} else {
+			*thisNode->shape->height *= scal[1][1];
+		}
 		if (thisNode->parent != displayClass->graph->rootNode) {
-			*thisNode->furniture->height += *thisNode->parent->furniture->height;
+			if (thisNode->furniture == NULL) {
+				if (thisNode->parent->furniture == NULL) {
+					*thisNode->shape->height += *thisNode->parent->shape->height;
+				} else {
+					*thisNode->shape->height += *thisNode->parent->furniture->height;
+				}
+			} else {
+				if (thisNode->parent->furniture == NULL) {
+					*thisNode->furniture->height += *thisNode->parent->shape->height;
+				} else {
+					*thisNode->furniture->height += *thisNode->parent->furniture->height;
+				}
+			}
 		}
 		thisNode->rotate = new glm::mat4(rot);// * *par->rotate);
 		thisNode->translate = new glm::mat4(transl);
@@ -167,7 +230,7 @@ void MyGLWidget::initializeGL() {
 Node* MyGLWidget::setPar(Node* thisNode, Node* par, int xi, float* yi, int zi) {
 	if (par->children->size() == 1) {
 		*yi += *par->children->at(0)->furniture->height;
-		return setPar(thisNode, par->children->at(0), xi, yi, zi);
+		return setPar(thisNode, par->children->at(0), xi + 0.5, yi, zi + 0.5);
 	}
 	return par;
 }

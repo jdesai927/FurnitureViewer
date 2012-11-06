@@ -1,7 +1,6 @@
 #include "table.h"
 
-Table::Table() : Furniture(3) {
-	height = new float(0.28f);
+Table::Table() : Furniture(0.35f, 3) {
 	primitives->push_back(new int(1));
 	primitives->push_back(new int(1));
 	primitives->push_back(new int(1));
@@ -16,7 +15,6 @@ Table::Table() : Furniture(3) {
 }
 
 Table::~Table() {
-	delete height;
 	primitives->clear();
 	delete primitives;
 	localTransforms->clear();

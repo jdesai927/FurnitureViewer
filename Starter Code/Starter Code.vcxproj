@@ -38,6 +38,7 @@
     <ClCompile Include="glew.c" />
     <ClCompile Include="lamp.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="mesh.cpp" />
     <ClCompile Include="myglwidget.cpp" />
     <ClCompile Include="node.cpp" />
     <ClCompile Include="Primitive.cpp" />
@@ -59,6 +60,7 @@
     <ClInclude Include="glew.h" />
     <ClInclude Include="glxew.h" />
     <ClInclude Include="lamp.h" />
+    <ClInclude Include="mesh.h" />
     <ClInclude Include="node.h" />
     <ClInclude Include="primitive.h" />
     <ClInclude Include="prism.h" />

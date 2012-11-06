@@ -1,0 +1,41 @@
+5 5 6
+
+table
+0.3 0.3 0.5
+1 1
+0
+1 1 1
+
+chair
+0.9 0.3 0.0
+1 2
+90
+1 1 1
+
+mesh
+testextrusion1.dat
+bricks.jpg
+1 1
+0
+1 1 1
+
+mesh
+testextrusion2.dat
+wood.jpg
+4 3
+45
+1 2 1
+
+mesh
+testsurfrev1.dat
+bricks.jpg
+4 3
+0
+1 1 1
+
+mesh
+testsurfrev2.dat
+wood.jpg
+0 4
+0
+0.5 0.5 0.5

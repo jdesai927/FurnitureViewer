@@ -13,7 +13,6 @@
 class Camera
 {
 private:
-	glm::vec3 eye;
 	glm::vec3 center;
 	glm::vec3 up;
 	float fovy;
@@ -32,6 +31,7 @@ public:
 	// vec3 getEyePos(void);
 	// void setEyePos(vec3 pos);
 	// get camera matrices:
+	glm::vec3 eye;
 	glm::mat4 getCameraMatrix();
 
 	// resize

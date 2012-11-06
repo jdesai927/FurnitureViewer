@@ -113,16 +113,17 @@ float* Prism::generateCBO(int colInt) {
 
 float* Prism::generateNBO() {
 	float* norms = new float[96];
-	/*
+	
 	glm::vec3 vec1;
 	glm::vec3 vec2;
 	glm::vec3 vec3;
+	/*
 	for (int i = 0; i < 96; i += 4) {
 		if (i % 16 == 0) {
 			vec1.x = vbo[i]; vec1.y = vbo[i+1]; vec1.z = vbo[i+2];
 			vec2.x = vbo[i+4]; vec2.y = vbo[i+5]; vec2.z = vbo[i+6];
 			vec3.x = vbo[i+8]; vec2.y = vbo[i+9]; vec2.z = vbo[i+10];
-			vec1 = glm::cross(vec1 - vec2, vec2 - vec3);
+			vec1 = glm::normalize(glm::cross(vec1 - vec2, vec2 - vec3));
 		}
 		norms[i]     = vec1.x;//0.0f;
 		norms[i + 1] = vec1.y;//0.0f;
@@ -171,7 +172,7 @@ float* Prism::generateNBO() {
 	return norms;
 }
 
-Prism::Prism(int colInt, float edgeLengthX, float edgeLengthY, float edgeLengthZ, glm::vec4 c) : Primitive(0){
+Prism::Prism(int colInt, float edgeLengthX, float edgeLengthY, float edgeLengthZ, glm::vec4 c) : Primitive(0, 0){
 	vbo = generateVBO(edgeLengthX, edgeLengthY, edgeLengthZ, c);
 	ibo = generateIBO();
 	cbo = generateCBO(colInt);

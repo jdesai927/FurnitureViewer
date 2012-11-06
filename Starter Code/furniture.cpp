@@ -1,6 +1,6 @@
 #include "furniture.h"
 
-Furniture::Furniture(int k) : Primitive(k) {
+Furniture::Furniture(float h, int k) : Primitive(h, k) {
 	primitives = new std::vector<int*>();
 	localTransforms = new std::vector<glm::mat4*>();
 }

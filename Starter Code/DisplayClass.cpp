@@ -80,7 +80,9 @@ DisplayClass::DisplayClass(void)
 	prism = new Prism(0, 0.6, 0.6, 0.6, glm::vec4(-0.3f, -0.3f, 0.3f, 1.0f));
 	sphere = new Sphere();
 	cylinder = new Cylinder();
-	lightPos = new glm::vec3(0.0f, 3.0f, 5.0f);
+	lightPos = new glm::vec3(10.0f, 6.0f, 0.0f);
+	lightCol = new glm::vec3(1.0f, 1.0f, 1.0f);
+	ambientCol = new glm::vec3(1.0f, 1.0f, 1.0f);
 	this->camera = new Camera();
 	rotation = 0.0f;
 
@@ -157,6 +159,9 @@ DisplayClass::DisplayClass(void)
 	u_modelMatrixLocation = glGetUniformLocation(shaderProgram, "u_modelMatrix");
 	u_projMatrixLocation = glGetUniformLocation(shaderProgram, "u_projMatrix");
 	u_lightPosLocation = glGetUniformLocation(shaderProgram, "u_lightPos");
+	u_lightColLocation = glGetUniformLocation(shaderProgram, "u_lightCol");
+	u_cameraPosLocation = glGetUniformLocation(shaderProgram, "u_cameraPos");
+	u_ambientColLocation = glGetUniformLocation(shaderProgram, "u_ambientCol");
 
 	//Always remember that it doesn't do much good if you don't have OpenGL actually use the shaders
 	glUseProgram(shaderProgram);
@@ -225,7 +230,11 @@ void DisplayClass::drawNode(Node* n) {
 		b = true;
 	}
 	if (n->shape != NULL) {
-		drawPrimitive(b, n->shape, *n->translate * *n->rotate * *n->scale);
+		glm::mat4 id;
+		if (*n->shape->kind > 98) {
+			id = id;// * glm::scale(glm::mat4(), glm::vec3(0.1, 0.1, 0.1));
+		}
+		drawPrimitive(b, n->shape, *n->translate * *n->rotate * *n->scale * id);
 	}
 	if (n->furniture != NULL) {
 		drawFurniture(b, n->furniture, *n->translate * *n->rotate * *n->scale);
@@ -302,6 +311,14 @@ void DisplayClass::drawPrimitive(bool b, Primitive* p, glm::mat4 modelMatrix) {
 
 	//set light position uniform
 	glUniform3f(u_lightPosLocation, lightPos->x, lightPos->y, lightPos->z);
+
+	//set light color uniform
+	glUniform3f(u_lightColLocation, lightCol->x, lightCol->y, lightCol->z);
+
+	//set camera position uniform
+	glUniform3f(u_cameraPosLocation, camera->eye.x, camera->eye.y, camera->eye.z);
+
+	glUniform3f(u_ambientColLocation, ambientCol->x, ambientCol->y, ambientCol->z);
 
 	//draw the elements
 	if (*p->kind == 2 || *p->kind == 1) {

@@ -6,9 +6,8 @@
 
 class Furniture : public Primitive {
 public:
-	float* height;
 	std::vector<int*>* primitives;
 	std::vector<glm::mat4*>* localTransforms;
-	Furniture(int);
+	Furniture(float,int);
 	~Furniture();
 };

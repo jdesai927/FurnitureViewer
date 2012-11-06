@@ -1,7 +1,6 @@
 #include "chair.h"
 
-Chair::Chair() : Furniture(4) {
-	height = new float(0.5f);
+Chair::Chair() : Furniture(0.55, 4) {
 	primitives->push_back(new int(0));
 	primitives->push_back(new int(0));
 	primitives->push_back(new int(1));
@@ -20,7 +19,6 @@ Chair::Chair() : Furniture(4) {
 }
 
 Chair::~Chair() {
-	delete height;
 	primitives->clear();
 	delete primitives;
 	localTransforms->clear();

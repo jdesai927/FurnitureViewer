@@ -4,7 +4,7 @@
 
 #define M_PI 3.1415926
 
-Sphere::Sphere() : Primitive(2) {
+Sphere::Sphere() : Primitive(0, 2) {
 	float num = 2 * 19 * 9;
 	numIbo = new int(num);
 	numCbo = new int(num * 3);

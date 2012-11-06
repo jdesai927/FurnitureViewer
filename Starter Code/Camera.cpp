@@ -5,7 +5,7 @@
 Camera::Camera(void)
 {
 	// setup default camera parameters
-	this->eye = glm::vec3(0, 1, 5);
+	this->eye = glm::vec3(0, 3.0f, 4.0f);
 	this->center = glm::vec3(0, 0, 0);
 	this->up = glm::vec3(0, 1, 0);
 	this->fovy = 60.0f;

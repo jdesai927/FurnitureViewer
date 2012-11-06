@@ -1,0 +1,27 @@
+4 4 4
+
+table
+0 0 0
+1 1
+0
+1 1 1
+
+mesh
+mysurfrev1.dat
+bricks.jpg
+1 1
+0
+0.25 0.25 0.25
+
+lamp
+0 0.8 0
+2 2
+45
+3 3 3
+
+mesh
+testsurfrev2.dat
+bricks.jpg
+3 3
+0
+0.25 0.25 0.25
