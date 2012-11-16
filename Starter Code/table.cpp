@@ -1,6 +1,6 @@
 #include "table.h"
 
-Table::Table() : Furniture(0.35f, 3) {
+Table::Table(int m) : Furniture(0.35f, 3, m) {
 	primitives->push_back(new int(1));
 	primitives->push_back(new int(1));
 	primitives->push_back(new int(1));

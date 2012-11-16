@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'startercode.ui'
 **
-** Created: Sat Nov 3 14:58:34 2012
+** Created: Wed Nov 14 14:46:40 2012
 **      by: Qt User Interface Compiler version 4.8.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!

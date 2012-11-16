@@ -3,13 +3,25 @@
 Node::Node(Primitive* prim, Furniture* f, Node* par, int xI, int zI) {
 	shape = prim;
 	furniture = f;
+	normal = new glm::vec3();
 	children = new std::vector<Node*>();
 	parent = par;
 	xInd = new int(xI);
 	zInd = new int(zI);
+	currentWorldTransform = new glm::mat4();
 	rotate = new glm::mat4();
 	translate = new glm::mat4();
+	t = new double(-1.0);
 	scale = new glm::mat4();
+}
+
+void Node::computeAllInverses() {
+	if (furniture != NULL) {
+		furniture->computeInverses(*translate * *rotate * *scale);
+	}
+	for (int i = 0; i < children->size(); i++) {
+		children->at(i)->computeAllInverses();
+	}
 }
 
 void Node::traverseNodes(int type, glm::mat4 transform) {

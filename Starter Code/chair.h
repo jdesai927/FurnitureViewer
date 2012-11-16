@@ -7,6 +7,6 @@
 
 class Chair : public Furniture {
 public:
-	Chair();
+	Chair(int m);
 	~Chair();
 };

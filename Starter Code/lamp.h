@@ -5,6 +5,6 @@
 
 class Lamp : public Furniture {
 public:
-	Lamp();
+	Lamp(int m);
 	~Lamp();
 };

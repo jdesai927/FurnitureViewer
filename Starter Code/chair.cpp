@@ -1,6 +1,6 @@
 #include "chair.h"
 
-Chair::Chair() : Furniture(0.55, 4) {
+Chair::Chair(int m) : Furniture(0.55, 4, m) {
 	primitives->push_back(new int(0));
 	primitives->push_back(new int(0));
 	primitives->push_back(new int(1));

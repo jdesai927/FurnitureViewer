@@ -5,6 +5,6 @@
 
 class Table : public Furniture {
 public:
-	Table();
+	Table(int m);
 	~Table();
 };

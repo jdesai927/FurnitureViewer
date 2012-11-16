@@ -2,8 +2,9 @@
 #include <iostream>
 #include "../glm/gtc/matrix_transform.hpp"
 
-Mesh::Mesh(float length, int numVerts, std::vector<glm::vec3> verts) : Primitive(length, 99) {
+Mesh::Mesh(int m, float length, int numVerts, std::vector<glm::vec3> verts) : Primitive(length, 99) {
 	//Extrusion
+	mtl = new int(m);
 	numVbo = new int(24 * numVerts);
 	bool convex = isConvex(numVerts, verts);
 	if (convex) {
@@ -175,8 +176,9 @@ bool Mesh::isConvex(int numVerts, std::vector<glm::vec3> verts) {
 	return true;
 }
 
-Mesh::Mesh(int numSlices, int numVerts, std::vector<glm::vec4> verts) : Primitive(0, 100) {
+Mesh::Mesh(int m, int numSlices, int numVerts, std::vector<glm::vec4> verts) : Primitive(0, 100) {
 	//Surfrev
+	mtl = new int(m);
 	if (numSlices < 3) {
 		std::cerr << "Invalid number of slices" << std::endl;
 		exit(1);

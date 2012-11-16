@@ -1,6 +1,7 @@
 // codebit written by Tiantian Liu @ University of Pennsylvania, 2012
 #include "DisplayClass.h"
 #include <math.h>
+#include "stubs.h"
 
 #define M_PI 3.1415926
 
@@ -343,6 +344,241 @@ void DisplayClass::drawPrimitive(bool b, Primitive* p, glm::mat4 modelMatrix) {
 
 void DisplayClass::createGreenPrism(glm::mat4 modelMatrix) {
 	
+}
+
+glm::vec3 DisplayClass::mapPoint(float px, float py, glm::vec3 M, glm::vec3 H, glm::vec3 V) {
+	float sx = px/(*resoX - 1);
+	float sy = py/(*resoY - 1);
+	return (M + ((2 * sx) - 1) * H + ((2 * sy) - 1) * V);
+}
+
+Node* DisplayClass::recIntersection(glm::vec3 P, glm::vec3 V, Node* n) {
+	*n->t = -1.0;
+	Node* c = NULL;
+	double res;
+	double cT;
+	//Node* ch = NULL;
+	if (n->furniture != NULL) {
+		for (int i = 0; i < n->furniture->primitives->size(); i++) {
+			switch(*n->furniture->primitives->at(i)) {
+			case 0:
+				res = Test_RayCubeIntersect(P, V, *n->furniture->inverses->at(i));
+				if (res != -1) {
+					if (c == NULL || res < *c->t) {
+						c = n;
+						*c->t = res;
+						glm::vec3 inters = P + ((float)res) * V;
+						glm::vec4 myNorm;
+						if (inters.z > 0.499 && inters.z < 0.501) {
+						  myNorm.x = 0.0f;
+						  myNorm.y = 0.0f;
+						  myNorm.z = 1.0f;
+						} else if (inters.z < -0.499 && inters.z > -0.501) {
+						  myNorm.x = 0.0f;
+						  myNorm.y = 0.0f;
+						  myNorm.z = -1.0f;
+						} else if (inters.x > 0.499 && inters.x < 0.501) {
+						  myNorm.x = 1.0f;
+						  myNorm.y = 0.0f;
+						  myNorm.z = 0.0f;
+						} else if (inters.x < -0.499 && inters.x > -0.501) {
+						  myNorm.x = -1.0f;
+						  myNorm.y = 0.0f;
+						  myNorm.z = 0.0f;
+						} else if (inters.y > 0.499 && inters.y < 0.501) {
+						  myNorm.x = 0.0f;
+						  myNorm.y = 1.0f;
+						  myNorm.z = 0.0f;
+						} else if (inters.y < -0.499 && inters.y > -0.501) {
+						  myNorm.x = 0.0f;
+						  myNorm.y = -1.0f;
+						  myNorm.z = 0.0f;
+						}
+						myNorm[3] = 0.0f;
+						myNorm = glm::normalize(*n->furniture->worldTransforms->at(i) * myNorm);
+						*c->currentWorldTransform = *n->furniture->worldTransforms->at(i);
+						c->normal->x = myNorm.x;
+						c->normal->y = myNorm.y;
+						c->normal->z = myNorm.z;
+					}
+				}
+				break;
+			case 1:
+				res = Test_RayCylinderIntersect(P, V, *n->furniture->inverses->at(i));
+				if (res != -1) {
+					if (c == NULL || res < *c->t) {
+						c = n;
+						*c->t = res;
+						glm::vec3 inters = P + ((float)res) * V;
+						glm::vec4 myNorm(2.0f * inters.x, 0.0f, 2.0f * inters.z, 0.0f);
+						myNorm = glm::normalize(*n->furniture->worldTransforms->at(i) * myNorm);
+						*c->currentWorldTransform = *n->furniture->worldTransforms->at(i);
+						c->normal->x = myNorm.x;
+						c->normal->y = myNorm.y;
+						c->normal->z = myNorm.z;
+					}
+				}
+				break;
+			case 2:
+				res = Test_RaySphereIntersect(P, V, *n->furniture->inverses->at(i));
+				if (res != -1) {
+					if (c == NULL || *c->t == -1 || res < *c->t) {
+						c = n;
+						*c->t = res;
+						glm::vec3 inters = P + ((float)res) * V;
+						glm::vec4 myNorm(inters.x, inters.y, inters.z, 0.0f);
+						myNorm = glm::normalize(*n->furniture->worldTransforms->at(i) * myNorm);
+						*c->currentWorldTransform = *n->furniture->worldTransforms->at(i);
+						c->normal->x = myNorm.x;
+						c->normal->y = myNorm.y;
+						c->normal->z = myNorm.z;
+					}
+				}
+				break;
+			}
+		}
+		//do intersection tests, get intersection with minimum t-value
+	} else if (n->shape != NULL) {
+		if (*n->shape->kind < 99) {
+			
+		}
+		//loop through triangles and find intersection with minimum t-value
+	}
+	Node* ch = NULL;
+	for (int i = 0; i < n->children->size(); i++) {
+		ch = recIntersection(P, V, n->children->at(i));
+		if (ch != NULL) {
+			if (c == NULL || *c->t == -1 || *ch->t < *c->t) {
+				c = ch;
+			}
+		}
+	}
+	return c;
+}
+
+Node* DisplayClass::getIntersectionObject(glm::vec3 P, glm::vec3 V) {
+	return recIntersection(P, V, graph->rootNode);
+}
+
+void DisplayClass::traceRay(glm::vec3* color, int depth, glm::vec3 P, glm::vec3 V) {
+	if (depth > 5) {
+		color->x = rayAmbientCol->x;
+		color->y = rayAmbientCol->y;
+		color->z = rayAmbientCol->z;
+		return;
+	}
+	Node* n = getIntersectionObject(P, V);
+	if (n == NULL) {
+		color->x = rayAmbientCol->x;
+		color->y = rayAmbientCol->y;
+		color->z = rayAmbientCol->z;
+		return;
+	}
+
+	//find intersection
+	glm::vec3 intersection = P + (((float) *n->t) * glm::normalize(V));
+	glm::vec4 intersect4(intersection.x, intersection.y, intersection.z, 0.0f);
+	intersect4 = *n->currentWorldTransform * intersect4;
+	intersection.x = intersect4.x;
+	intersection.y = intersect4.y;
+	intersection.z = intersect4.z;
+
+	//get material
+	float* mt;
+	switch(*n->furniture->mtl) {
+	case 1:
+		mt = mtl1;
+		break;
+	case 2:
+		mt = mtl2;
+		break;
+	case 3:
+		mt = mtl3;
+		break;
+	}
+
+	glm::vec3 N = glm::normalize(*n->normal); //compute normal at intersection point
+	glm::vec3 Rd = glm::normalize(glm::reflect(V, N)); //compute reflected ray direction
+
+	//if reflective, make recursive call
+	glm::vec3 spec(0.0f, 0.0f, 0.0f);
+	if (mt[4] > 0.0f) {
+		glm::vec3* reflectedColor = new glm::vec3();
+		traceRay(reflectedColor, depth + 1, intersection, Rd);
+		spec = *reflectedColor;
+		delete reflectedColor;
+	}
+
+	//ambient color
+	color->x = rayAmbientCol->x * mt[0]; //* 0.2;
+	color->y = rayAmbientCol->y * mt[1]; //* 0.2;
+	color->z = rayAmbientCol->z * mt[2]; //* 0.2;
+
+	//cast ray for shadow
+	Node* blocker = getIntersectionObject(*rayLightPos, glm::normalize(intersection - *rayLightPos));
+
+	//if not shadowed, add more color
+	if (blocker == NULL || ((*blocker->t < (*n->t + 0.001)) && (*blocker->t > (*n->t - 0.001)))) {
+
+		//diffuse color
+		glm::vec3 diffuseColor(mt[0] * rayLightCol->x, mt[1] * rayLightCol->y, mt[2] * rayLightCol->z);
+		
+		//specular term
+		float specTerm = glm::clamp(pow(glm::dot(glm::reflect(-1.0f * *rayLightPos, N), glm::normalize(P - intersection)), mt[3]), 0.0f, 1.0f);
+
+		//diffuse term
+		float diffuseTerm = glm::clamp(glm::dot(N, glm::normalize(*rayLightPos - intersection)), 0.0f, 1.0f);
+
+		//final color weighted calculation
+		//blinn-phong
+		*color = *color + (0.5f * diffuseTerm * diffuseColor) + (specTerm * 0.3f * *rayLightCol);
+
+		//reflectivity-weighted
+		*color = ((1.0f - mt[4]) * *color) + (mt[4] * spec);
+	}
+
+}
+
+void DisplayClass::doRayTrace() {
+	graph->rootNode->computeAllInverses();
+	unsigned int width = static_cast<int>(*resoX);
+	unsigned int height = static_cast<int>(*resoY);
+	glm::vec3 A = glm::cross(rayCamera->center, rayCamera->up);
+	glm::vec3 B = glm::cross(A, rayCamera->center);
+	glm::vec3 M = rayCamera->center + rayCamera->eye;
+	glm::vec3 V = (B * glm::length(rayCamera->center) * tan(glm::radians(rayCamera->fovy)))/ glm::length(B);
+	//float fovx = atan(length(V) * (*WriteBMP::resoX/ *WriteBMP::resoY)/length(M));
+	glm::vec3 H = (*resoX/ *resoY) * V;
+	H.x = H.y;
+	H.y = 0.0f;
+	H.z = 0.0f;
+	BMP output;
+	output.SetSize(width, height);
+	output.SetBitDepth(24);
+	glm::vec3 P;
+	glm::vec3 D;
+	glm::vec3* E = new glm::vec3(rayCamera->eye.x, rayCamera->eye.y, rayCamera->eye.z);
+	glm::vec3* color = new glm::vec3();
+	std::cout << "Beginning raytrace" << std::endl;
+	for(unsigned int x = 0; x < width; x++) {
+		for(unsigned int y = 0; y < height; y++) {
+			color = new glm::vec3(0.0f, 0.0f, 0.0f);
+			E->x = rayCamera->eye.x;
+			E->y = rayCamera->eye.y;
+			E->z = rayCamera->eye.z;
+			P = DisplayClass::mapPoint(x, y, M, H, V);
+			D = (P - *E)/glm::length(P - *E);
+			traceRay(color, 0, *E, D);
+			output(x, y)->Red = 255 * color->x;
+			output(x, y)->Green = 255 * color->y;
+			output(x, y)->Blue = 255 * color->z;
+			delete color;
+			color = 0;
+		}
+	
+		std::cout << "finished vertical line: " << x << std::endl;
+	}
+	output.WriteToFile(rayOutputFile->c_str());
 }
 
 void DisplayClass::createRedSquare(glm::mat4 modelMatrix)

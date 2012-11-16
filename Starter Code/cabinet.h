@@ -7,6 +7,6 @@
 
 class Cabinet : public Furniture {
 public:
-	Cabinet();
+	Cabinet(int m);
 	~Cabinet();
 };

@@ -1,6 +1,6 @@
 #include "cabinet.h"
 
-Cabinet::Cabinet() : Furniture(0.3f, 6) {
+Cabinet::Cabinet(int m) : Furniture(0.3f, 6, m) {
 	primitives->push_back(new int(0));
 	primitives->push_back(new int(2));
 	primitives->push_back(new int(2));

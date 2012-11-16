@@ -14,6 +14,7 @@
 #include "../glm/gtc/matrix_transform.hpp"
 
 #include "Camera.h"
+#include "../EasyBMP_1.06/EasyBMP.h"
 #include "prism.h"
 #include "cylinder.h"
 #include "table.h"
@@ -38,15 +39,30 @@ public: // public members
 public: // public methods
 	DisplayClass(void);
 	~DisplayClass(void);
+	glm::vec3 mapPoint(float,float,glm::vec3,glm::vec3,glm::vec3);
+	Node* getIntersectionObject(glm::vec3,glm::vec3);
+	Node* recIntersection(glm::vec3, glm::vec3, Node*);
+	void traceRay(glm::vec3*, int, glm::vec3, glm::vec3);
 	Prism* prism;
 	Prism* floor;
+	float* mtl1;
+	float* mtl2;
+	float* mtl3;
 	Sphere* sphere;
 	Cylinder* cylinder;
 	glm::vec3* lightPos;
 	glm::vec3* lightCol;
 	glm::vec3* ambientCol;
 	Node* selectedNode;
+	glm::vec3* rayLightPos;
+	glm::vec3* rayLightCol;
+	glm::vec3* rayAmbientCol;
+	std::string* rayOutputFile;
+	float* resoX;
+	float* resoY;
+	Camera* rayCamera;
 
+	void doRayTrace();
 	void resizeWindow(int w, int h);
 	void redraw();
 	void drawNode(Node* n);

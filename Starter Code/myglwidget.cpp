@@ -2,6 +2,7 @@
 #include "MyGLWidget.h"
 #include "mesh.h"
 
+#define cut(s) (s.substr(5, s.length() - 1))
 
 # pragma region constructors and destructos
 MyGLWidget::MyGLWidget(QWidget* parent) : QGLWidget(parent) {
@@ -46,6 +47,85 @@ extern char* filename;
 // initialize opengl components event handler
 void MyGLWidget::initializeGL() {
 	displayClass = new DisplayClass();
+	std::ifstream tracer;
+	std::string ts;
+	tracer.open("raytracer_config_sample.txt");
+	
+	//output filename
+	getline(tracer, ts);
+	displayClass->rayOutputFile = new std::string(cut(ts));
+	
+	//resolution
+	getline(tracer, ts);
+	glm::vec3 v = getVec(cut(ts));
+	displayClass->resoX = new float(v.x);
+	displayClass->resoY = new float(v.y);
+
+	displayClass->rayCamera = new Camera();
+	//eye
+	getline(tracer, ts);
+	displayClass->rayCamera->eye = getVec(cut(ts));
+
+	//view direction
+	getline(tracer, ts);
+	displayClass->rayCamera->center = getVec(cut(ts));
+
+	//up vec
+	getline(tracer, ts);
+	displayClass->rayCamera->up = getVec(cut(ts));
+
+	//fovy
+	getline(tracer, ts);
+	displayClass->rayCamera->fovy = getVec(cut(ts)).x;
+
+	//lightpos
+	getline(tracer, ts);
+	displayClass->rayLightPos = new glm::vec3(getVec(cut(ts)));
+
+	//lightcol
+	getline(tracer, ts);
+	displayClass->rayLightCol = new glm::vec3(getVec(cut(ts)));
+
+	//ambient color
+	getline(tracer, ts);
+	displayClass->rayAmbientCol = new glm::vec3(getVec(cut(ts)));
+
+	//mat1
+	getline(tracer, ts);
+	ts = cut(ts);
+	std::istringstream myStream = static_cast<std::istringstream>(ts);
+	float tem;
+	displayClass->mtl1 = new float[8];
+	int ml = 0;
+	while (myStream >> tem) {
+		displayClass->mtl1[ml] = tem;
+		ml++;
+	}
+
+	//mat2
+	getline(tracer, ts);
+	ts = cut(ts);
+	myStream = static_cast<std::istringstream>(ts);
+	displayClass->mtl2 = new float[8];
+	ml = 0;
+	while (myStream >> tem) {
+		displayClass->mtl2[ml] = tem;
+		ml++;
+	}
+
+	//mat3
+	getline(tracer, ts);
+	ts = cut(ts);
+	myStream = static_cast<std::istringstream>(ts);
+	displayClass->mtl3 = new float[8];
+	ml = 0;
+	while (myStream >> tem) {
+		displayClass->mtl3[ml] = tem;
+		ml++;
+	}
+
+	tracer.close();
+
 	std::ifstream config;
 	std::ifstream meshfile;
 	config.open(filename);
@@ -89,23 +169,35 @@ void MyGLWidget::initializeGL() {
 		getline(config, reader);
 		getline(config, reader);
 		myName = reader;
-		if (reader == "table") {
-			currentPrimitive = new Table();
-		} else if (reader == "chair") {
-			currentPrimitive = new Chair();
-		} else if (reader == "cabinet") {
-			currentPrimitive = new Cabinet();
-		} else if (reader == "lamp") {
-			currentPrimitive = new Lamp();
-		} else if (reader == "multitable") {
-			currentPrimitive = new Table();
+		if (myName == "table") {
+			getline(config, reader);
+			int mtl = getVec(reader).x;
+			currentPrimitive = new Table(mtl);
+		} else if (myName == "chair") {
+			getline(config, reader);
+			int mtl = getVec(reader).x;
+			currentPrimitive = new Chair(mtl);
+		} else if (myName == "cabinet") {
+			getline(config, reader);
+			int mtl = getVec(reader).x;
+			currentPrimitive = new Cabinet(mtl);
+		} else if (myName == "lamp") {
+			getline(config, reader);
+			int mtl = getVec(reader).x;
+			currentPrimitive = new Lamp(mtl);
+		} else if (myName == "multitable") {
+			getline(config, reader);
+			int mtl = getVec(reader).x;
+			currentPrimitive = new Table(mtl);
 			*currentPrimitive->localTransforms->at(currentPrimitive->localTransforms->size() - 1) *= glm::scale(glm::mat4(), glm::vec3(2.0f, 1.0f, 1.0f));
 			/*for (int n = 0; n < currentPrimitive->localTransforms->size(); n++) {
 				*currentPrimitive->localTransforms->at(n) = glm::translate(glm::mat4(), glm::vec3(0.5f, 0.0f, 0.0f)) * *currentPrimitive->localTransforms->at(n);
 			}*/
-		} else if (reader == "mesh") {
+		} else if (myName == "mesh") {
 			getline(config, reader);
 			meshfile.open(reader);
+			getline(config, reader);
+			int mtl = getVec(reader).x;
 			getline(meshfile, meshparse);
 			if (meshparse == "extrusion") {
 				getline(meshfile, meshparse);
@@ -121,7 +213,7 @@ void MyGLWidget::initializeGL() {
 					glm::vec3 myvec(vec.x, 0.0f, vec.y);
 					verts.push_back(myvec);
 				}
-				myMesh = new Mesh(len, numVerts, verts);
+				myMesh = new Mesh(mtl, len, numVerts, verts);
 			} else if (meshparse == "surfrev") {
 				getline(meshfile, meshparse);
 				vec = getVec(meshparse);
@@ -140,13 +232,13 @@ void MyGLWidget::initializeGL() {
 					glm::vec4 myvec(vec.x, vec.y, 0.0f, 1.0f);
 					verts.push_back(myvec);
 				}
-				myMesh = new Mesh(numSlices, numVerts, verts);
+				myMesh = new Mesh(mtl, numSlices, numVerts, verts);
 			}
 			meshfile.close();
 		}
 
 		//colors
-		getline(config, reader);
+		//getline(config, reader);
 
 		//translation
 		getline(config, reader);
@@ -314,6 +406,9 @@ void MyGLWidget::keyPressEvent(QKeyEvent *e){
 	{
 	case Qt::Key::Key_Shift:
 		*invertMode = true;
+		break;
+	case Qt::Key::Key_P:
+		displayClass->doRayTrace();
 		break;
 	case Qt::Key::Key_Q:
 		break;
