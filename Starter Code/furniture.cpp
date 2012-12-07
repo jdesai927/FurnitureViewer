@@ -5,7 +5,7 @@ Furniture::Furniture(float h, int k, int m) : Primitive(h, k) {
 	worldTransforms = new std::vector<glm::mat4*>();
 	localTransforms = new std::vector<glm::mat4*>();
 	inverses = new std::vector<glm::mat4*>();
-	mtl = new int(m);
+	
 }
 
 void Furniture::computeInverses(glm::mat4 T) {
@@ -24,5 +24,5 @@ Furniture::~Furniture() {
 	delete localTransforms;
 	inverses->clear();
 	delete inverses;
-	delete mtl;
+	//delete mtl;
 }

@@ -11,10 +11,13 @@ public:
 	Primitive* shape;
 	Furniture* furniture;
 	glm::mat4* currentWorldTransform;
+	glm::mat4* worldTransform;
 	glm::mat4* translate;
 	glm::mat4* rotate;
 	glm::mat4* scale;
 	glm::mat4* inv;
+	glm::mat4* boundTrans;
+	int* mtl;
 	double* t;
 	int* xInd;
 	int* zInd;

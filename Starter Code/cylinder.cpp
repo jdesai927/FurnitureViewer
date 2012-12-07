@@ -31,18 +31,18 @@ void Cylinder::generateIBO() {
 
 void Cylinder::generateVBO() {
 	float x = 0.0f;
-	float y = 0.0f;
+	float y = -0.5f;
 	float z = 0.0f;
 	vbo = new float[*numVbo];
 	nbo = new float[*numVbo];
 	cbo = new float[*numCbo];
 	float sides = 10.0f;
-	float height = 3.0f;
+	float height = 1.0f;
 	const float theta = 2. * M_PI / sides;
 	float c = cos(theta);
 	float s = sin(theta);
 
-	float x2 = 2.0f, z2 = 0;
+	float x2 = 0.5f, z2 = 0;
 	int a = 0;
 	int b = 0;
 	int m = 88;
@@ -61,13 +61,13 @@ void Cylinder::generateVBO() {
 		cbo[col + 1] = 0.5f;
 		cbo[col + 2] = 0.8f;
 		col += 3;
-		vbo[b] = (x + x2) * 0.2;
+		vbo[b] = x + x2;
 		vbo[b + 1] = y * 0.2;
-		vbo[b + 2] = (z + z2) * 0.2;
+		vbo[b + 2] = z + z2;
 		vbo[b + 3] = 1.0f;
-		vbo[m] = (x + x2) * 0.2;
-		vbo[m + 1] = (y + height) * 0.2;
-		vbo[m + 2] = (z + z2) * 0.2;
+		vbo[m] = x + x2;
+		vbo[m + 1] = y + height;
+		vbo[m + 2] = z + z2;
 		vbo[m + 3] = 1.0f;
 		nbo[m] = 0.0f;
 		nbo[m + 1] = 1.0f;
@@ -86,9 +86,9 @@ void Cylinder::generateVBO() {
 		cbo[col + 1] = 0.5f;
 		cbo[col + 2] = 0.8f;
 		col += 3;
-		vbo[b] = (x + x2) * 0.2;
-		vbo[b + 1] = (y + height) * 0.2;
-		vbo[b + 2] = (z + z2) * 0.2;
+		vbo[b] = x + x2;
+		vbo[b + 1] = y + height;
+		vbo[b + 2] = z + z2;
 		vbo[b + 3] = 1.0f;
 		b += 4;
 		const float x3 = x2;

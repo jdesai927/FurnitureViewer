@@ -42,6 +42,7 @@ MyGLWidget::~MyGLWidget() {
 # pragma endregion
 
 extern char* filename;
+extern char* raytraceconfig;
 
 #pragma region event handlers
 // initialize opengl components event handler
@@ -49,7 +50,7 @@ void MyGLWidget::initializeGL() {
 	displayClass = new DisplayClass();
 	std::ifstream tracer;
 	std::string ts;
-	tracer.open("raytracer_config_sample.txt");
+	tracer.open(raytraceconfig);
 	
 	//output filename
 	getline(tracer, ts);
@@ -78,17 +79,27 @@ void MyGLWidget::initializeGL() {
 	getline(tracer, ts);
 	displayClass->rayCamera->fovy = getVec(cut(ts)).x;
 
-	//lightpos
-	getline(tracer, ts);
-	displayClass->rayLightPos = new glm::vec3(getVec(cut(ts)));
+	displayClass->rayLightPos = new std::vector<glm::vec3*>();
+	displayClass->rayLightCol = new std::vector<glm::vec3*>();
+	glm::vec3* lpos;
+	glm::vec3* lcol;
+	
+	for (int lc = 0; lc < 3; lc++) {
+		//lightpos
+		getline(tracer, ts);
+		lpos = new glm::vec3(getVec(cut(ts)));
+		displayClass->rayLightPos->push_back(lpos);
 
-	//lightcol
-	getline(tracer, ts);
-	displayClass->rayLightCol = new glm::vec3(getVec(cut(ts)));
+		//lightcol
+		getline(tracer, ts);
+		lcol = new glm::vec3(getVec(cut(ts)));
+		displayClass->rayLightCol->push_back(lcol);
 
+	}
 	//ambient color
 	getline(tracer, ts);
 	displayClass->rayAmbientCol = new glm::vec3(getVec(cut(ts)));
+	*displayClass->rayAmbientCol = glm::clamp(*displayClass->rayAmbientCol, 0.0f, 1.0f);
 
 	//mat1
 	getline(tracer, ts);
@@ -124,6 +135,16 @@ void MyGLWidget::initializeGL() {
 		ml++;
 	}
 
+	displayClass->mtlf = new float[8];
+	displayClass->mtlf[0] = 1.0f;
+	displayClass->mtlf[1] = 1.0f;
+	displayClass->mtlf[2] = 1.0f;
+	displayClass->mtlf[3] = 5.0f;
+	displayClass->mtlf[4] = 0.8f;
+	displayClass->mtlf[5] = 0.0f;
+	displayClass->mtlf[6] = 0.0f;
+	displayClass->mtlf[7] = 0.0f;
+
 	tracer.close();
 
 	std::ifstream config;
@@ -149,6 +170,7 @@ void MyGLWidget::initializeGL() {
 	displayClass->floor = new Prism(1, xSize, 0.1f, -1 * zSize, origin);
 	SceneGraph* sg = displayClass->graph;
 	sg->rootNode = new Node(displayClass->floor, NULL, NULL, 0, 0);
+	*sg->rootNode->mtl = 4;
 	sg->rootNode->scale = new glm::mat4();//glm::scale(glm::mat4(), glm::vec3(xSize, 0.1f, zSize)));
 	sg->rootNode->rotate = new glm::mat4();
 	sg->rootNode->translate = new glm::mat4();
@@ -161,6 +183,7 @@ void MyGLWidget::initializeGL() {
 	int xi;
 	float* yi;
 	int zi;
+	int mtl;
 	std::string myName;
 	std::string meshparse;
 	while (i < numItems) {
@@ -171,23 +194,23 @@ void MyGLWidget::initializeGL() {
 		myName = reader;
 		if (myName == "table") {
 			getline(config, reader);
-			int mtl = getVec(reader).x;
+			mtl = getVec(reader).x;
 			currentPrimitive = new Table(mtl);
 		} else if (myName == "chair") {
 			getline(config, reader);
-			int mtl = getVec(reader).x;
+			mtl = getVec(reader).x;
 			currentPrimitive = new Chair(mtl);
 		} else if (myName == "cabinet") {
 			getline(config, reader);
-			int mtl = getVec(reader).x;
+			mtl = getVec(reader).x;
 			currentPrimitive = new Cabinet(mtl);
 		} else if (myName == "lamp") {
 			getline(config, reader);
-			int mtl = getVec(reader).x;
+			mtl = getVec(reader).x;
 			currentPrimitive = new Lamp(mtl);
 		} else if (myName == "multitable") {
 			getline(config, reader);
-			int mtl = getVec(reader).x;
+			mtl = getVec(reader).x;
 			currentPrimitive = new Table(mtl);
 			*currentPrimitive->localTransforms->at(currentPrimitive->localTransforms->size() - 1) *= glm::scale(glm::mat4(), glm::vec3(2.0f, 1.0f, 1.0f));
 			/*for (int n = 0; n < currentPrimitive->localTransforms->size(); n++) {
@@ -197,7 +220,7 @@ void MyGLWidget::initializeGL() {
 			getline(config, reader);
 			meshfile.open(reader);
 			getline(config, reader);
-			int mtl = getVec(reader).x;
+			mtl = getVec(reader).x;
 			getline(meshfile, meshparse);
 			if (meshparse == "extrusion") {
 				getline(meshfile, meshparse);
@@ -258,6 +281,7 @@ void MyGLWidget::initializeGL() {
 		scal = glm::scale(glm::mat4(), vec);
 		
 		thisNode = new Node(NULL, currentPrimitive, NULL, xi, zi);
+		*thisNode->mtl = mtl;
 		if (myName == "mesh") {
 			thisNode->shape = myMesh;
 			if (*myMesh->kind == 99) {

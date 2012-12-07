@@ -1,0 +1,93 @@
+﻿Build started 11/27/2012 3:55:21 PM.
+     1>Project "C:\Users\jdesai\Documents\CppWorkspace\SceneGraphStarterCodeQT\SceneGraphStarterCodeQT\Starter Code\Starter Code.vcxproj" on node 2 (build target(s)).
+     1>InitializeBuildStatus:
+         Creating "Release\Furniture Viewer.unsuccessfulbuild" because "AlwaysCreate" was specified.
+       ComputeCustomBuildOutput:
+         Creating directory "C:\Users\jdesai\Documents\CppWorkspace\SceneGraphStarterCodeQT\SceneGraphStarterCodeQT\Starter Code\GeneratedFiles\Release\".
+       CustomBuild:
+         Moc'ing startercode.h...
+         Moc'ing myglwidget.h...
+         Rcc'ing startercode.qrc...
+     1>RCC : warning : No resources in 'C:\Users\jdesai\Documents\CppWorkspace\SceneGraphStarterCodeQT\SceneGraphStarterCodeQT\Starter Code\startercode.qrc'.
+         
+         Uic'ing startercode.ui...
+       ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /I.\GeneratedFiles /ID:\Qt\4.8.1\include /I.\GeneratedFiles\Release /ID:\Qt\4.8.1\include\qtmain /ID:\Qt\4.8.1\include\QtCore /ID:\Qt\4.8.1\include\QtGui /ID:\Qt\4.8.1\include\QtOpenGL /I.\ /nologo /W1 /WX- /O2 /Oy- /D UNICODE /D WIN32 /D QT_LARGEFILE_SUPPORT /D QT_NO_DEBUG /D NDEBUG /D QT_CORE_LIB /D QT_GUI_LIB /D QT_OPENGL_LIB /D QT_DLL /Gm- /EHsc /MD /GS /fp:precise /Zc:wchar_t- /Zc:forScope /Fo"Release\\" /Fd"Release\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt ..\EasyBMP_1.06\EasyBMP.cpp cabinet.cpp Camera.cpp chair.cpp cylinder.cpp DisplayClass.cpp furniture.cpp GeneratedFiles\Release\moc_myglwidget.cpp GeneratedFiles\Release\moc_startercode.cpp lamp.cpp main.cpp mesh.cpp myglwidget.cpp node.cpp Primitive.cpp prism.cpp scenegraph.cpp sphere.cpp startercode.cpp stubs.cpp table.cpp
+         EasyBMP.cpp
+         cabinet.cpp
+         Camera.cpp
+         chair.cpp
+         cylinder.cpp
+         DisplayClass.cpp
+         furniture.cpp
+         moc_myglwidget.cpp
+         moc_startercode.cpp
+         lamp.cpp
+         main.cpp
+         mesh.cpp
+         myglwidget.cpp
+     1>myglwidget.cpp(352): warning C4482: nonstandard extension used: enum 'Qt::Key' used in qualified name
+     1>myglwidget.cpp(407): warning C4482: nonstandard extension used: enum 'Qt::Key' used in qualified name
+     1>myglwidget.cpp(410): warning C4482: nonstandard extension used: enum 'Qt::Key' used in qualified name
+     1>myglwidget.cpp(413): warning C4482: nonstandard extension used: enum 'Qt::Key' used in qualified name
+     1>myglwidget.cpp(415): warning C4482: nonstandard extension used: enum 'Qt::Key' used in qualified name
+     1>myglwidget.cpp(421): warning C4482: nonstandard extension used: enum 'Qt::Key' used in qualified name
+     1>myglwidget.cpp(424): warning C4482: nonstandard extension used: enum 'Qt::Key' used in qualified name
+     1>myglwidget.cpp(427): warning C4482: nonstandard extension used: enum 'Qt::Key' used in qualified name
+     1>myglwidget.cpp(430): warning C4482: nonstandard extension used: enum 'Qt::Key' used in qualified name
+     1>myglwidget.cpp(433): warning C4482: nonstandard extension used: enum 'Qt::Key' used in qualified name
+     1>myglwidget.cpp(442): warning C4482: nonstandard extension used: enum 'Qt::Key' used in qualified name
+     1>myglwidget.cpp(451): warning C4482: nonstandard extension used: enum 'Qt::Key' used in qualified name
+     1>myglwidget.cpp(460): warning C4482: nonstandard extension used: enum 'Qt::Key' used in qualified name
+     1>myglwidget.cpp(470): warning C4482: nonstandard extension used: enum 'Qt::Key' used in qualified name
+     1>myglwidget.cpp(483): warning C4482: nonstandard extension used: enum 'Qt::Key' used in qualified name
+         node.cpp
+         Primitive.cpp
+         prism.cpp
+         scenegraph.cpp
+         sphere.cpp
+         startercode.cpp
+         stubs.cpp
+         Generating Code...
+         Compiling...
+         table.cpp
+         Generating Code...
+         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /I.\GeneratedFiles /ID:\Qt\4.8.1\include /I.\GeneratedFiles\Release /ID:\Qt\4.8.1\include\qtmain /ID:\Qt\4.8.1\include\QtCore /ID:\Qt\4.8.1\include\QtGui /ID:\Qt\4.8.1\include\QtOpenGL /I.\ /nologo /W1 /WX- /O2 /Oy- /D UNICODE /D WIN32 /D QT_LARGEFILE_SUPPORT /D QT_NO_DEBUG /D NDEBUG /D QT_CORE_LIB /D QT_GUI_LIB /D QT_OPENGL_LIB /D QT_DLL /Gm- /EHsc /MD /GS /fp:precise /Zc:wchar_t- /Zc:forScope /Fo"Release\\" /Fd"Release\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt GeneratedFiles\qrc_startercode.cpp
+         qrc_startercode.cpp
+         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /I.\GeneratedFiles /ID:\Qt\4.8.1\include /I.\GeneratedFiles\Release /ID:\Qt\4.8.1\include\qtmain /ID:\Qt\4.8.1\include\QtCore /ID:\Qt\4.8.1\include\QtGui /ID:\Qt\4.8.1\include\QtOpenGL /I.\ /nologo /W1 /WX- /O2 /Oy- /D UNICODE /D WIN32 /D QT_LARGEFILE_SUPPORT /D QT_NO_DEBUG /D NDEBUG /D QT_CORE_LIB /D QT_GUI_LIB /D QT_OPENGL_LIB /D QT_DLL /Gm- /EHsc /MD /GS /fp:precise /Zc:wchar_t- /Zc:forScope /Fo"Release\\" /Fd"Release\vc100.pdb" /Gd /TC /analyze- /errorReport:prompt glew.c
+         glew.c
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\jdesai\Documents\CppWorkspace\SceneGraphStarterCodeQT\SceneGraphStarterCodeQT\\Furniture Viewer.exe" /NOLOGO /LIBPATH:D:\Qt\4.8.1\lib qtmain.lib QtCore4.lib QtGui4.lib QtOpenGL4.lib opengl32.lib glu32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /ManifestFile:"Release\Furniture Viewer.exe.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /PDB:"C:\Users\jdesai\Documents\CppWorkspace\SceneGraphStarterCodeQT\SceneGraphStarterCodeQT\Furniture Viewer.pdb" /SUBSYSTEM:WINDOWS /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\jdesai\Documents\CppWorkspace\SceneGraphStarterCodeQT\SceneGraphStarterCodeQT\Furniture Viewer.lib" /MACHINE:X86 Release\EasyBMP.obj
+         Release\cabinet.obj
+         Release\Camera.obj
+         Release\chair.obj
+         Release\cylinder.obj
+         Release\DisplayClass.obj
+         Release\furniture.obj
+         Release\qrc_startercode.obj
+         Release\moc_myglwidget.obj
+         Release\moc_startercode.obj
+         Release\glew.obj
+         Release\lamp.obj
+         Release\main.obj
+         Release\mesh.obj
+         Release\myglwidget.obj
+         Release\node.obj
+         Release\Primitive.obj
+         Release\prism.obj
+         Release\scenegraph.obj
+         Release\sphere.obj
+         Release\startercode.obj
+         Release\stubs.obj
+         Release\table.obj
+         Starter Code.vcxproj -> C:\Users\jdesai\Documents\CppWorkspace\SceneGraphStarterCodeQT\SceneGraphStarterCodeQT\Furniture Viewer.exe
+       Manifest:
+         C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\bin\mt.exe /nologo /verbose /outputresource:"C:\Users\jdesai\Documents\CppWorkspace\SceneGraphStarterCodeQT\SceneGraphStarterCodeQT\\Furniture Viewer.exe;#1" /manifest "Release\Furniture Viewer.exe.intermediate.manifest"
+       FinalizeBuildStatus:
+         Deleting file "Release\Furniture Viewer.unsuccessfulbuild".
+         Touching "Release\Furniture Viewer.lastbuildstate".
+     1>Done Building Project "C:\Users\jdesai\Documents\CppWorkspace\SceneGraphStarterCodeQT\SceneGraphStarterCodeQT\Starter Code\Starter Code.vcxproj" (build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:42.14

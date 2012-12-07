@@ -1,4 +1,5 @@
 #include "node.h"
+#include "mesh.h"
 
 Node::Node(Primitive* prim, Furniture* f, Node* par, int xI, int zI) {
 	shape = prim;
@@ -9,15 +10,24 @@ Node::Node(Primitive* prim, Furniture* f, Node* par, int xI, int zI) {
 	xInd = new int(xI);
 	zInd = new int(zI);
 	currentWorldTransform = new glm::mat4();
+	boundTrans = new glm::mat4();
+	worldTransform = new glm::mat4();
+	inv = new glm::mat4();
 	rotate = new glm::mat4();
 	translate = new glm::mat4();
+	mtl = new int(-1);
 	t = new double(-1.0);
 	scale = new glm::mat4();
 }
 
 void Node::computeAllInverses() {
+	*worldTransform = *translate * *rotate * *scale;
 	if (furniture != NULL) {
-		furniture->computeInverses(*translate * *rotate * *scale);
+		furniture->computeInverses(*worldTransform);
+	}
+	*inv = glm::inverse(*worldTransform);
+	if (shape != NULL && *shape->kind > 97) {
+		*boundTrans = glm::inverse(*worldTransform * *static_cast<Mesh*>(shape)->mybound);
 	}
 	for (int i = 0; i < children->size(); i++) {
 		children->at(i)->computeAllInverses();

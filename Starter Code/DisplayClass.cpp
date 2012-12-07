@@ -10,25 +10,25 @@
 // glsl utilities
 // from swiftless.com
 char* DisplayClass::textFileRead(const char* fileName) {
-    char* text;
-    
-    if (fileName != NULL) {
-        FILE *file = fopen(fileName, "rt");
-        
-        if (file != NULL) {
-            fseek(file, 0, SEEK_END);
-            int count = ftell(file);
-            rewind(file);
-            
-            if (count > 0) {
-                text = (char*)malloc(sizeof(char) * (count + 1));
-                count = fread(text, sizeof(char), count, file);
-                text[count] = '\0';	//cap off the string with a terminal symbol, fixed by Cory
-            }
-            fclose(file);
-        }
-    }
-    return text;
+	char* text;
+
+	if (fileName != NULL) {
+		FILE *file = fopen(fileName, "rt");
+
+		if (file != NULL) {
+			fseek(file, 0, SEEK_END);
+			int count = ftell(file);
+			rewind(file);
+
+			if (count > 0) {
+				text = (char*)malloc(sizeof(char) * (count + 1));
+				count = fread(text, sizeof(char), count, file);
+				text[count] = '\0';	//cap off the string with a terminal symbol, fixed by Cory
+			}
+			fclose(file);
+		}
+	}
+	return text;
 }
 
 void DisplayClass::printLinkInfoLog(int prog) 
@@ -78,7 +78,7 @@ void DisplayClass::printShaderInfoLog(int shader)
 #pragma region constructors and destructors
 DisplayClass::DisplayClass(void)
 {
-	prism = new Prism(0, 0.6, 0.6, 0.6, glm::vec4(-0.3f, -0.3f, 0.3f, 1.0f));
+	prism = new Prism(0, 1.0f, 1.0f, 1.0f, glm::vec4(-0.5f, -0.5f, 0.5f, 1.0f));
 	sphere = new Sphere();
 	cylinder = new Cylinder();
 	lightPos = new glm::vec3(10.0f, 6.0f, 0.0f);
@@ -114,7 +114,7 @@ DisplayClass::DisplayClass(void)
 	vertexShader = glCreateShader(GL_VERTEX_SHADER);
 	fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
 	shaderProgram = glCreateProgram();
-	
+
 	//load up the source, compile and link the shader program
 	const char* vertSource = textFileRead(vertFile);
 	const char* fragSource = textFileRead(fragFile);
@@ -200,7 +200,7 @@ void DisplayClass::resizeWindow(int w, int h)
 }
 
 void drawSphere () {
-	
+
 }
 
 void DisplayClass::redraw()
@@ -265,7 +265,7 @@ void DisplayClass::drawPrimitive(bool b, Primitive* p, glm::mat4 modelMatrix) {
 	//now we put the data into the Vertex Buffer Object for the graphics system to use
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferData(GL_ARRAY_BUFFER, *p->numVbo * sizeof(float), p->vbo, GL_STATIC_DRAW); //the square vertices don't need to change, ever,
-																				 //while the program run
+	//while the program run
 	//again with colors
 
 	glBindBuffer(GL_ARRAY_BUFFER, cbo);
@@ -281,7 +281,7 @@ void DisplayClass::drawPrimitive(bool b, Primitive* p, glm::mat4 modelMatrix) {
 	}
 
 	glBufferData(GL_ARRAY_BUFFER, *p->numCbo * sizeof(float), mycbo, GL_STREAM_DRAW);	//the color is going to change every frame
-																				//as it bounces between squares
+	//as it bounces between squares
 
 	glBindBuffer(GL_ARRAY_BUFFER, nbo);
 	glBufferData(GL_ARRAY_BUFFER, *p->numVbo * sizeof(float), p->nbo, GL_STATIC_DRAW); //the square normals don't need to change, ever,
@@ -290,16 +290,16 @@ void DisplayClass::drawPrimitive(bool b, Primitive* p, glm::mat4 modelMatrix) {
 	glEnableVertexAttribArray(positionLocation);
 	glEnableVertexAttribArray(colorLocation);
 	glEnableVertexAttribArray(normalLocation);
-	
+
 	//we're using the vertex data first
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	//define how the vertex pointer should work, in our case we're accessing floats 4 at a time with no special pattern
 	glVertexAttribPointer(positionLocation, 4, GL_FLOAT, 0, 0, static_cast<char*>(0));
-	
+
 	//now use color data, remember we're not using 4 at a time anymore
 	glBindBuffer(GL_ARRAY_BUFFER, cbo);
 	glVertexAttribPointer(colorLocation, 3, GL_FLOAT, 0, 0, static_cast<char*>(0));
-	
+
 	//one more time with the normals
 	glBindBuffer(GL_ARRAY_BUFFER, nbo);
 	glVertexAttribPointer(normalLocation, 4, GL_FLOAT, 0, 0, static_cast<char*>(0));
@@ -343,7 +343,7 @@ void DisplayClass::drawPrimitive(bool b, Primitive* p, glm::mat4 modelMatrix) {
 }
 
 void DisplayClass::createGreenPrism(glm::mat4 modelMatrix) {
-	
+
 }
 
 glm::vec3 DisplayClass::mapPoint(float px, float py, glm::vec3 M, glm::vec3 H, glm::vec3 V) {
@@ -367,35 +367,45 @@ Node* DisplayClass::recIntersection(glm::vec3 P, glm::vec3 V, Node* n) {
 					if (c == NULL || res < *c->t) {
 						c = n;
 						*c->t = res;
-						glm::vec3 inters = P + ((float)res) * V;
+						glm::vec4 p4(P.x, P.y, P.z, 1.0f);
+						glm::vec4 v4(V.x, V.y, V.z, 0.0f);
+						p4 = *n->furniture->inverses->at(i) * p4;
+						v4 = *n->furniture->inverses->at(i) * v4;
+						glm::vec4 inters = p4 + ((float)res) * v4;
 						glm::vec4 myNorm;
-						if (inters.z > 0.499 && inters.z < 0.501) {
-						  myNorm.x = 0.0f;
-						  myNorm.y = 0.0f;
-						  myNorm.z = 1.0f;
-						} else if (inters.z < -0.499 && inters.z > -0.501) {
-						  myNorm.x = 0.0f;
-						  myNorm.y = 0.0f;
-						  myNorm.z = -1.0f;
-						} else if (inters.x > 0.499 && inters.x < 0.501) {
-						  myNorm.x = 1.0f;
-						  myNorm.y = 0.0f;
-						  myNorm.z = 0.0f;
-						} else if (inters.x < -0.499 && inters.x > -0.501) {
-						  myNorm.x = -1.0f;
-						  myNorm.y = 0.0f;
-						  myNorm.z = 0.0f;
-						} else if (inters.y > 0.499 && inters.y < 0.501) {
-						  myNorm.x = 0.0f;
-						  myNorm.y = 1.0f;
-						  myNorm.z = 0.0f;
-						} else if (inters.y < -0.499 && inters.y > -0.501) {
-						  myNorm.x = 0.0f;
-						  myNorm.y = -1.0f;
-						  myNorm.z = 0.0f;
+						bool forward = inters.z > 0.4999 && inters.z < 0.5001;
+						bool backward = inters.z < -0.4999 && inters.z > -0.5001;
+						bool right = inters.x > 0.4999 && inters.x < 0.5001;
+						bool left = inters.x < -0.4999 && inters.x > -0.5001;
+						bool up = inters.y > 0.4999 && inters.y < 0.5001;
+						bool down = inters.y < -0.4999 && inters.y > -0.5001;
+						if (forward) {
+							myNorm.x = 0.0f;
+							myNorm.y = 0.0f;
+							myNorm.z = 1.0f;
+						} else if (backward) {
+							myNorm.x = 0.0f;
+							myNorm.y = 0.0f;
+							myNorm.z = -1.0f;
+						} else if (right) {
+							myNorm.x = 1.0f;
+							myNorm.y = 0.0f;
+							myNorm.z = 0.0f;
+						} else if (left) {
+							myNorm.x = -1.0f;
+							myNorm.y = 0.0f;
+							myNorm.z = 0.0f;
+						} else if (up) {
+							myNorm.x = 0.0f;
+							myNorm.y = 1.0f;
+							myNorm.z = 0.0f;
+						} else if (down) {
+							myNorm.x = 0.0f;
+							myNorm.y = -1.0f;
+							myNorm.z = 0.0f;
 						}
 						myNorm[3] = 0.0f;
-						myNorm = glm::normalize(*n->furniture->worldTransforms->at(i) * myNorm);
+						myNorm = glm::normalize(glm::transpose(*n->furniture->inverses->at(i)) * myNorm);
 						*c->currentWorldTransform = *n->furniture->worldTransforms->at(i);
 						c->normal->x = myNorm.x;
 						c->normal->y = myNorm.y;
@@ -409,9 +419,13 @@ Node* DisplayClass::recIntersection(glm::vec3 P, glm::vec3 V, Node* n) {
 					if (c == NULL || res < *c->t) {
 						c = n;
 						*c->t = res;
-						glm::vec3 inters = P + ((float)res) * V;
+						glm::vec4 p4(P.x, P.y, P.z, 1.0f);
+						glm::vec4 v4(V.x, V.y, V.z, 0.0f);
+						p4 = *n->furniture->inverses->at(i) * p4;
+						v4 = *n->furniture->inverses->at(i) * v4;
+						glm::vec4 inters = p4 + ((float)res) * v4;
 						glm::vec4 myNorm(2.0f * inters.x, 0.0f, 2.0f * inters.z, 0.0f);
-						myNorm = glm::normalize(*n->furniture->worldTransforms->at(i) * myNorm);
+						myNorm = glm::normalize(glm::transpose(*n->furniture->inverses->at(i)) * myNorm);
 						*c->currentWorldTransform = *n->furniture->worldTransforms->at(i);
 						c->normal->x = myNorm.x;
 						c->normal->y = myNorm.y;
@@ -422,25 +436,64 @@ Node* DisplayClass::recIntersection(glm::vec3 P, glm::vec3 V, Node* n) {
 			case 2:
 				res = Test_RaySphereIntersect(P, V, *n->furniture->inverses->at(i));
 				if (res != -1) {
-					if (c == NULL || *c->t == -1 || res < *c->t) {
+					if (c == NULL || res < *c->t) {
 						c = n;
 						*c->t = res;
-						glm::vec3 inters = P + ((float)res) * V;
-						glm::vec4 myNorm(inters.x, inters.y, inters.z, 0.0f);
-						myNorm = glm::normalize(*n->furniture->worldTransforms->at(i) * myNorm);
+						glm::vec4 p4(P.x, P.y, P.z, 1.0f);
+						glm::vec4 v4(V.x, V.y, V.z, 0.0f);
+						p4 = *n->furniture->inverses->at(i) * p4;
+						v4 = *n->furniture->inverses->at(i) * v4;
+						glm::vec4 inters = p4 + ((float)res) * v4;
+						glm::vec4 myNorm(inters.x * 2.0f, inters.y * 2.0f, inters.z * 2.0f, 0.0f);
+						myNorm = glm::normalize(glm::transpose(*n->furniture->inverses->at(i)) * myNorm);
 						*c->currentWorldTransform = *n->furniture->worldTransforms->at(i);
 						c->normal->x = myNorm.x;
 						c->normal->y = myNorm.y;
 						c->normal->z = myNorm.z;
 					}
-				}
+				} /*else {
+				  glm::vec3 x;
+				  }*/
 				break;
 			}
 		}
 		//do intersection tests, get intersection with minimum t-value
 	} else if (n->shape != NULL) {
-		if (*n->shape->kind < 99) {
-			
+		if (*n->shape->kind < 97 || Test_RayCubeIntersect(P, V, *n->boundTrans) != -1) {
+			glm::vec3 p1;
+			glm::vec3 p2;
+			glm::vec3 p3;
+			glm::vec4 norm(0.0f, 0.0f, 0.0f, 0.0f);
+			double minT = -1;
+			for (int q = 0; q < *n->shape->numVbo; q+=12) {
+				p1.x = n->shape->vbo[q];
+				p1.y = n->shape->vbo[q + 1];
+				p1.z = n->shape->vbo[q + 2];
+				p2.x = n->shape->vbo[q + 4];
+				p2.y = n->shape->vbo[q + 5];
+				p2.z = n->shape->vbo[q + 6];
+				p3.x = n->shape->vbo[q + 8];
+				p3.y = n->shape->vbo[q + 9];
+				p3.z = n->shape->vbo[q + 10];
+				res = Test_RayPolyIntersect(P, V, p1, p2, p3, *n->inv);
+				if (res != -1 && (minT > res || minT == -1)) {
+					minT = res;
+					norm.x = n->shape->nbo[q];
+					norm.y = n->shape->nbo[q + 1];
+					norm.z = n->shape->nbo[q + 2];
+				}
+			}
+			if (minT != -1) {
+				if (c == NULL || *c->t == -1 || res < *c->t) {
+					c = n;
+					*c->t = minT;
+					norm = glm::normalize(glm::transpose(*n->inv) * norm);
+					*c->currentWorldTransform = *n->worldTransform;
+					c->normal->x = norm.x;
+					c->normal->y = norm.y;
+					c->normal->z = norm.z;
+				}
+			}
 		}
 		//loop through triangles and find intersection with minimum t-value
 	}
@@ -460,7 +513,7 @@ Node* DisplayClass::getIntersectionObject(glm::vec3 P, glm::vec3 V) {
 	return recIntersection(P, V, graph->rootNode);
 }
 
-void DisplayClass::traceRay(glm::vec3* color, int depth, glm::vec3 P, glm::vec3 V) {
+void DisplayClass::traceRay(glm::vec3* color, int depth, glm::vec3 P, glm::vec3 V, float currentRI, float oldRI, glm::vec3 lcol) {
 	if (depth > 5) {
 		color->x = rayAmbientCol->x;
 		color->y = rayAmbientCol->y;
@@ -476,16 +529,11 @@ void DisplayClass::traceRay(glm::vec3* color, int depth, glm::vec3 P, glm::vec3 
 	}
 
 	//find intersection
-	glm::vec3 intersection = P + (((float) *n->t) * glm::normalize(V));
-	glm::vec4 intersect4(intersection.x, intersection.y, intersection.z, 0.0f);
-	intersect4 = *n->currentWorldTransform * intersect4;
-	intersection.x = intersect4.x;
-	intersection.y = intersect4.y;
-	intersection.z = intersect4.z;
+	glm::vec3 intersection = P + (((float) *n->t) * V);
 
 	//get material
 	float* mt;
-	switch(*n->furniture->mtl) {
+	switch(*n->mtl) {
 	case 1:
 		mt = mtl1;
 		break;
@@ -495,47 +543,100 @@ void DisplayClass::traceRay(glm::vec3* color, int depth, glm::vec3 P, glm::vec3 
 	case 3:
 		mt = mtl3;
 		break;
+	case 4:
+		mt = mtlf;
+		break;
 	}
 
 	glm::vec3 N = glm::normalize(*n->normal); //compute normal at intersection point
 	glm::vec3 Rd = glm::normalize(glm::reflect(V, N)); //compute reflected ray direction
+	float RI = mt[6];
+	glm::vec3 Rfn = N;
 
 	//if reflective, make recursive call
 	glm::vec3 spec(0.0f, 0.0f, 0.0f);
 	if (mt[4] > 0.0f) {
 		glm::vec3* reflectedColor = new glm::vec3();
-		traceRay(reflectedColor, depth + 1, intersection, Rd);
+		traceRay(reflectedColor, depth + 1, intersection + 0.001f * Rd, Rd, currentRI, oldRI, lcol);//glm::vec3(lcol.x * mt[0], lcol.y * mt[1], lcol.z * mt[2]));
 		spec = *reflectedColor;
 		delete reflectedColor;
 	}
 
-	//ambient color
-	color->x = rayAmbientCol->x * mt[0]; //* 0.2;
-	color->y = rayAmbientCol->y * mt[1]; //* 0.2;
-	color->z = rayAmbientCol->z * mt[2]; //* 0.2;
-
-	//cast ray for shadow
-	Node* blocker = getIntersectionObject(*rayLightPos, glm::normalize(intersection - *rayLightPos));
-
-	//if not shadowed, add more color
-	if (blocker == NULL || ((*blocker->t < (*n->t + 0.001)) && (*blocker->t > (*n->t - 0.001)))) {
-
-		//diffuse color
-		glm::vec3 diffuseColor(mt[0] * rayLightCol->x, mt[1] * rayLightCol->y, mt[2] * rayLightCol->z);
-		
-		//specular term
-		float specTerm = glm::clamp(pow(glm::dot(glm::reflect(-1.0f * *rayLightPos, N), glm::normalize(P - intersection)), mt[3]), 0.0f, 1.0f);
-
-		//diffuse term
-		float diffuseTerm = glm::clamp(glm::dot(N, glm::normalize(*rayLightPos - intersection)), 0.0f, 1.0f);
-
-		//final color weighted calculation
-		//blinn-phong
-		*color = *color + (0.5f * diffuseTerm * diffuseColor) + (specTerm * 0.3f * *rayLightCol);
-
-		//reflectivity-weighted
-		*color = ((1.0f - mt[4]) * *color) + (mt[4] * spec);
+	glm::vec3 refr(0.0f, 0.0f, 0.0f);
+	glm::vec3 Rf;
+	glm::vec3 tcol;
+	float insFl = -1.0f;
+	if (mt[5] > 0.0f) {
+		insFl = glm::dot(N, V);
+		tcol = glm::vec3(lcol.x * mt[0], lcol.y * mt[1], lcol.z * mt[2]);
+		if (insFl > -0.0001f) {
+			Rfn = -1.0f * N;
+			//tcol = lcol;
+			//RI = 1.0f;
+		}
+		if (currentRI == 1.0f) {
+			oldRI = RI;
+		}
+		float eta = currentRI/oldRI;
+		Rf = glm::normalize(glm::refract(V, Rfn, eta));
+		glm::vec3* refractedColor = new glm::vec3();
+		traceRay(refractedColor, depth + 1, intersection + 0.001f * Rf, Rf, oldRI, currentRI, lcol);
+		refr = *refractedColor;
+		delete refractedColor;
 	}
+
+	//ambient color
+	color->x = rayAmbientCol->x * mt[0];
+	color->y = rayAmbientCol->y * mt[1];
+	color->z = rayAmbientCol->z * mt[2];
+
+	*color = *color * 0.2f;
+
+	*color = glm::clamp(*color + refr, 0.0f, 1.0f);
+	
+	if (mt[5] > 0.0f) {
+		*color = ((1.0f - mt[4]) * *color) + (mt[4] * spec);
+		/*float cosT = glm::dot(Rf, V); //2.0f * glm::dot(-1.0f * Rfn, V);
+		float rcoef = glm::clamp(pow(1.0f - cosT, 5), 0.0f, 1.0f);
+		*color = glm::clamp(((1.0f - rcoef) * *color) + (rcoef * tcol), 0.0f, 1.0f);*/
+		return;
+	}
+	
+	//light ray
+	glm::vec3 L;
+	glm::vec3 R;
+	
+	for (int lc = 0; lc < 3; lc++) {
+		L = glm::normalize(*rayLightPos->at(lc) - intersection);
+		R = glm::reflect(-1.0f * L, N);
+
+		//cast ray for shadow
+		glm::vec3 blockob;
+		Node* blocker = getIntersectionObject(*rayLightPos->at(lc), -1.0f * L);
+		if (blocker != NULL) {
+			blockob = *rayLightPos->at(lc) - (((float) *blocker->t) * L);
+		}
+		float di = glm::length(blockob - intersection);
+		//if not shadowed, add more color
+		if (blocker == NULL || (di < 0.00001f && di > -0.00001f)) {
+
+			//diffuse color
+			glm::vec3 diffuseColor = glm::clamp(glm::vec3(mt[0] * rayLightCol->at(lc)->x, mt[1] * rayLightCol->at(lc)->y, mt[2] * rayLightCol->at(lc)->z), 0.0f, 1.0f);
+
+			//specular term
+			float specTerm = glm::clamp(pow(glm::dot(V, R), mt[3]), 0.0f, 1.0f);
+
+			//diffuse term
+			float diffuseTerm = glm::clamp(glm::dot(N, L), 0.0f, 1.0f);
+
+			//final color weighted calculation
+			//blinn-phong
+			*color = *color + (diffuseTerm * diffuseColor * 0.6f) + (glm::clamp(spec + specTerm * *rayLightCol->at(lc), 0.0f, 1.0f) * 0.2f);
+
+		}
+	}
+	//reflectivity-weighted
+	*color = ((1.0f - mt[4]) * *color) + (mt[4] * spec);
 
 }
 
@@ -566,18 +667,19 @@ void DisplayClass::doRayTrace() {
 			E->x = rayCamera->eye.x;
 			E->y = rayCamera->eye.y;
 			E->z = rayCamera->eye.z;
-			P = DisplayClass::mapPoint(x, y, M, H, V);
-			D = (P - *E)/glm::length(P - *E);
-			traceRay(color, 0, *E, D);
+			P = DisplayClass::mapPoint(x, height - y - 1, M, H, V);
+			D = glm::normalize(P - *E);///glm::length(P - *E);
+			traceRay(color, 0, *E, D, 1.0f, 1.0f, *rayLightCol->at(0));
 			output(x, y)->Red = 255 * color->x;
 			output(x, y)->Green = 255 * color->y;
 			output(x, y)->Blue = 255 * color->z;
 			delete color;
 			color = 0;
 		}
-	
+
 		std::cout << "finished vertical line: " << x << std::endl;
 	}
+	std::cout << "Finished raytrace!" << std::endl;
 	output.WriteToFile(rayOutputFile->c_str());
 }
 
@@ -594,7 +696,7 @@ void DisplayClass::createRedSquare(glm::mat4 modelMatrix)
 	//now we put the data into the Vertex Buffer Object for the graphics system to use
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferData(GL_ARRAY_BUFFER, 16 * sizeof(float), vertices, GL_STATIC_DRAW); //the square vertices don't need to change, ever,
-																				 //while the program runs
+	//while the program runs
 
 	//once the data is loaded, we can delete the float arrays, the data is safely stored with OpenGL
 	//vertices is an array that we created under this scope and stored in the HEAP, so release it if we don't want to use it anymore. 
@@ -602,7 +704,7 @@ void DisplayClass::createRedSquare(glm::mat4 modelMatrix)
 
 	//again with colors
 	float* colors = new float[12];
-	
+
 	colors[0] = 1; colors[1] = 0; colors[2] = 0;
 	colors[3] = 1; colors[4] = 0; colors[5] = 0;
 	colors[6] = 1; colors[7] = 0; colors[8] = 0;
@@ -611,12 +713,12 @@ void DisplayClass::createRedSquare(glm::mat4 modelMatrix)
 	glBindBuffer(GL_ARRAY_BUFFER, cbo);
 	//always make sure you are telling OpenGL the right size to make the buffer, color data doesn't have as much data!
 	glBufferData(GL_ARRAY_BUFFER, 12 * sizeof(float), colors, GL_STREAM_DRAW);	//the color is going to change every frame
-																				//as it bounces between squares
+	//as it bounces between squares
 	delete [] colors;
 
 	//once more, this time with normals
 	float* normals = new float[16];
-	
+
 	normals[0] = 0; normals[1] = 0; normals[2] = 1; normals[3] = 0;
 	normals[4] = 0; normals[5] = 0; normals[6] = 1; normals[7] = 0;
 	normals[8] = 0; normals[9] = 0; normals[10] = 1; normals[11] = 0;
@@ -624,27 +726,27 @@ void DisplayClass::createRedSquare(glm::mat4 modelMatrix)
 
 	glBindBuffer(GL_ARRAY_BUFFER, nbo);
 	glBufferData(GL_ARRAY_BUFFER, 16 * sizeof(float), normals, GL_STATIC_DRAW); //the square normals don't need to change, ever,
-																				 //while the program runs
+	//while the program runs
 	delete [] normals;
 
 	//activate our three kinds of information
 	glEnableVertexAttribArray(positionLocation);
 	glEnableVertexAttribArray(colorLocation);
 	glEnableVertexAttribArray(normalLocation);
-	
+
 	//we're using the vertex data first
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	//define how the vertex pointer should work, in our case we're accessing floats 4 at a time with no special pattern
 	glVertexAttribPointer(positionLocation, 4, GL_FLOAT, 0, 0, static_cast<char*>(0));
-	
+
 	//now use color data, remember we're not using 4 at a time anymore
 	glBindBuffer(GL_ARRAY_BUFFER, cbo);
 	glVertexAttribPointer(colorLocation, 3, GL_FLOAT, 0, 0, static_cast<char*>(0));
-	
+
 	//one more time with the normals
 	glBindBuffer(GL_ARRAY_BUFFER, nbo);
 	glVertexAttribPointer(normalLocation, 4, GL_FLOAT, 0, 0, static_cast<char*>(0));
-	
+
 	//the last thing we need to do is setup our indices
 	unsigned short* indices = new unsigned short[6];
 
@@ -661,7 +763,7 @@ void DisplayClass::createRedSquare(glm::mat4 modelMatrix)
 
 	//draw the elements
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
-	
+
 	//shut off the information since we're done drawing
 	glDisableVertexAttribArray(positionLocation);
 	glDisableVertexAttribArray(colorLocation);
@@ -672,7 +774,7 @@ void DisplayClass::createBlueSquare(glm::mat4 modelMatrix)
 {
 	//the only difference between a red square and a blue square is the color, so we can leave the other VBOs as they are
 	float* colors = new float[12];
-	
+
 	colors[0] = 0; colors[1] = 0; colors[2] = 1;
 	colors[3] = 0; colors[4] = 0; colors[5] = 1;
 	colors[6] = 0; colors[7] = 0; colors[8] = 1;
@@ -682,21 +784,21 @@ void DisplayClass::createBlueSquare(glm::mat4 modelMatrix)
 	glBufferData(GL_ARRAY_BUFFER, 12 * sizeof(float), colors, GL_STREAM_DRAW);
 
 	// we don't need to send vertices and normals to card again, because the blue square share the SAME geometry with the red square.
-	
+
 	delete [] colors;
 
 	//activate our three kinds of information
 	glEnableVertexAttribArray(positionLocation);
 	glEnableVertexAttribArray(colorLocation);
 	glEnableVertexAttribArray(normalLocation);
-	
+
 	//bind again
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glVertexAttribPointer(positionLocation, 4, GL_FLOAT, 0, 0, static_cast<char*>(0));
-	
+
 	glBindBuffer(GL_ARRAY_BUFFER, cbo);
 	glVertexAttribPointer(colorLocation, 3, GL_FLOAT, 0, 0, static_cast<char*>(0));
-	
+
 	glBindBuffer(GL_ARRAY_BUFFER, nbo);
 	glVertexAttribPointer(normalLocation, 4, GL_FLOAT, 0, 0, static_cast<char*>(0));
 
@@ -705,7 +807,7 @@ void DisplayClass::createBlueSquare(glm::mat4 modelMatrix)
 
 	//draw again, even the indices from before are good
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
-	
+
 	//shut off the information since we're done drawing
 	glDisableVertexAttribArray(positionLocation);
 	glDisableVertexAttribArray(colorLocation);

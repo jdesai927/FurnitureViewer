@@ -1,21 +1,32 @@
-3 3 3
-
-table
-1
-1 1
-45
-1 1 2
+3 3 2
 
 mesh
 testextrusion1.dat
-2
+1
 0 0
+45
+0.5 0.5 0.5
+
+chair
+2
+1 1
 0
 1 1 1
 
-mesh
-testsurfrev1.dat
+lamp
 3
-2 2
+4 0
 0
-1 1 1
+4 4 4
+
+lamp
+1
+4 2
+0
+4 4 4
+
+lamp
+2
+4 4
+0
+4 4 4

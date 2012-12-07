@@ -54,7 +54,7 @@ void Sphere::createSphere() {
 			x=sin(thetar)*cos(phir);
 			y=cos(thetar)*cos(phir);
 			z=sin(phir);
-			thisPoint = glm::vec3(0.4 * x, 0.4 * y, 0.4 * z);
+			thisPoint = glm::vec3(x, y, z);
 			vbo[i] = thisPoint.x;
 			vbo[i + 1] = thisPoint.y;
 			vbo[i + 2] = thisPoint.z;
@@ -72,7 +72,7 @@ void Sphere::createSphere() {
 			x=sin(thetar)*cos(phir20);
 			y=cos(thetar)*cos(phir20);
 			z=sin(phir20);
-			thisPoint = glm::vec3(0.4 * x, 0.4 * y, 0.4 * z);
+			thisPoint = glm::vec3(x, y, z);
 			vbo[i] = thisPoint.x;
 			vbo[i + 1] = thisPoint.y;
 			vbo[i + 2] = thisPoint.z;

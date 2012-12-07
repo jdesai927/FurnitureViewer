@@ -11,7 +11,6 @@ public:
 	std::vector<glm::mat4*>* localTransforms;
 	std::vector<glm::mat4*>* inverses;
 	void computeInverses(glm::mat4);
-	int* mtl;
 	Furniture(float,int,int);
 	~Furniture();
 };

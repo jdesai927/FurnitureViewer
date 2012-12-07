@@ -11,11 +11,36 @@ Mesh::Mesh(int m, float length, int numVerts, std::vector<glm::vec3> verts) : Pr
 		*numVbo += ((numVerts - 2) * 24);
 	}
 	glm::vec3 minvert = verts.at(0);
+	float minx = 999999.9f;
+	float maxx = -999999.9f;
+	float miny = 999999.9f;
+	float maxy = -999999.9f;
+	float minz = 999999.9f;
+	float maxz = -999999.9f;
 	for (int i = 1; i < numVerts; i++) {
 		if (verts.at(i).y < minvert.y) {
 			minvert = verts.at(i);
 		}
+		if (verts.at(i).x < minx) {
+			minx = verts.at(i).x;
+		}
+		if (verts.at(i).y < miny) {
+			miny = verts.at(i).y;
+		}
+		if (verts.at(i).z < minz) {
+			minz = verts.at(i).z;
+		}
+		if (verts.at(i).x > maxx) {
+			maxx = verts.at(i).x;
+		}
+		if (verts.at(i).y > maxy) {
+			maxy = verts.at(i).y;
+		}
+		if (verts.at(i).z > maxz) {
+			maxz = verts.at(i).z;
+		}
 	}
+	mybound = new glm::mat4(glm::scale(glm::mat4(), glm::vec3(maxx - minx, maxy - miny, maxz - minz)));
 	float morey = 0.0f;//0.35f;
 	if (minvert.y < 0) {
 		morey = -1 * minvert.z;
@@ -61,7 +86,7 @@ Mesh::Mesh(int m, float length, int numVerts, std::vector<glm::vec3> verts) : Pr
 		v3.x = x1;
 		v3.y = y1 + length + morey;
 		v3.z = z1;
-		norm = glm::normalize(glm::cross(v1 - v2, v2 - v3));
+		norm = glm::normalize(glm::cross(v3 - v1, v2 - v1));
 		for (int j = k; j < k + 24; j+=4) {
 			nbo[j] = norm.x;
 			nbo[j + 1] = norm.y;
@@ -185,6 +210,7 @@ Mesh::Mesh(int m, int numSlices, int numVerts, std::vector<glm::vec4> verts) : P
 	}
 	glm::vec4 maxvert = verts.at(0);
 	glm::vec4 minvert = verts.at(0);
+	float minx, maxx, miny, maxy, minz, maxz;
 	for (int i = 1; i < numVerts; i++) {
 		if (verts.at(i).y > maxvert.y) {
 			maxvert = verts.at(i);
@@ -192,7 +218,26 @@ Mesh::Mesh(int m, int numSlices, int numVerts, std::vector<glm::vec4> verts) : P
 		if (verts.at(i).y < minvert.y) {
 			minvert = verts.at(i);
 		}
+		if (verts.at(i).x < minx) {
+			minx = verts.at(i).x;
+		}
+		if (verts.at(i).y < miny) {
+			miny = verts.at(i).y;
+		}
+		if (verts.at(i).z < minz) {
+			minz = verts.at(i).z;
+		}
+		if (verts.at(i).x > maxx) {
+			maxx = verts.at(i).x;
+		}
+		if (verts.at(i).y > maxy) {
+			maxy = verts.at(i).y;
+		}
+		if (verts.at(i).z > maxz) {
+			maxz = verts.at(i).z;
+		}
 	}
+	mybound = new glm::mat4(glm::translate(glm::mat4(), glm::vec3(0.0f, (maxy - miny) * 0.5f, 0.0f)) * glm::scale(glm::mat4(), glm::vec3((maxx - minx) * 2.0f, maxy - miny, (maxx - minx) * 2.0f)));
 	*height = (maxvert.y - minvert.y);
 	float morey = 0.0f;
 	if (minvert.y < 0) {

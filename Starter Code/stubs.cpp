@@ -10,19 +10,19 @@ double Test_RaySphereIntersect(glm::vec3 const& P0, glm::vec3 const& V0, glm::ma
 	p0 = T * p0;
 	v0 = T * v0;
 
-	//double a = 1.0;
+	double a = (v0.x * v0.x) + (v0.y * v0.y) + (v0.z * v0.z);
 	double b = 2 * ( (p0.x * v0.x) + (p0.y * v0.y) + (p0.z * v0.z) );
-	double c = (p0.x * p0.x) + (p0.y * p0.y) + (p0.z * p0.z) - 1.0;
+	double c = (p0.x * p0.x) + (p0.y * p0.y) + (p0.z * p0.z) - 1.0f;
 
-	double disc = (b * b) - (4 * c);
+	double disc = (b * b) - (4 * a * c);
 
-	if (disc < 0) {
+	if (disc < -0.00001) {
 		return -1;
 	}
 
 	double distSqrt = sqrtf(disc);
-	double t0 = ((-1.0 * b) - distSqrt)/2.0;
-	double t1 = ((-1.0 * b) + distSqrt)/2.0;
+	double t0 = ((-1.0 * b) - distSqrt)/(2.0 * a);
+	double t1 = ((-1.0 * b) + distSqrt)/(2.0 * a);
 
 	/*
 	double q;
@@ -41,10 +41,10 @@ double Test_RaySphereIntersect(glm::vec3 const& P0, glm::vec3 const& V0, glm::ma
 		t1 = t0;
 		t0 = temp;
 	}
-	if (t1 < 0) {
+	if (t1 < -0.00001) {
 		return -1;
 	}
-	if (t0 < 0) {
+	if (t0 < -0.00001) {
 		return t1;
 	}
 	return t0;
@@ -70,27 +70,27 @@ double Test_RayPolyIntersect(glm::vec3 const& P0, glm::vec3 const& V0, glm::vec3
 	glm::vec3 h = glm::cross(d, e2);
 	float a = glm::dot(e1, h);
 
-	if (a > -0.001 && a < 0.001) {
+	if (a > -0.00001 && a < 0.00001) {
 		return -1;
 	}
 
 	double f = 1.0/a;
 	glm::vec3 s = p - v0;
 	float u = f * (glm::dot(s, h));
-	if (u < 0.0 || u > 1.0) {
+	if (u < -0.00001 || u > 1.00001) {
 		return -1;
 	}
 
 	glm::vec3 q = glm::cross(s, e1);
 	float v = f * (glm::dot(d, q));
 
-	if (v < 0.0 || u + v > 1.0) {
+	if (v < -0.00001 || u + v > 1.00001) {
 		return -1;
 	}
 
 	double t = f * glm::dot(e2, q);
 
-	if (t > 0.001) {
+	if (t > 0.00001) {
 		return t;
 	}
 	return -1;
@@ -114,7 +114,7 @@ double Test_RayCubeIntersect(glm::vec3 const& P0, glm::vec3 const& V0, glm::mat4
 	double t2;
 	double temp;
 	for (int i = 0; i < 3; i++) {
-		if (d[i] < 0.001 && d[i] > -0.001) {
+		if (d[i] < 0.00001 && d[i] > -0.00001) {
 			if (p[i] > 0.5 || p[i] < -0.5) {
 				return -1;
 			}
@@ -140,7 +140,7 @@ double Test_RayCubeIntersect(glm::vec3 const& P0, glm::vec3 const& V0, glm::mat4
 		}
 	}
 
-	if (tnear < 0) {
+	if (tnear < -0.00001) {
 		return tfar;
 	}
 
@@ -158,10 +158,10 @@ double CylinderWallIntersect (glm::vec3 p, glm::vec3 v) {
 		return -1;
 	}
 
-	if (a < 0.001 && a > -0.001) {
+	if (a < 0.00001 && a > -0.00001) {
 		double t = ((-1.0 * c)/b);
 		glm::vec3 intrs = p + (((float) t) * v);
-		if (intrs.y < 3.0 && intrs.y > 0.0) {
+		if (intrs.y < 0.5 && intrs.y > -0.5) {
 			return t;
 		}
 		return -1;
@@ -170,16 +170,16 @@ double CylinderWallIntersect (glm::vec3 p, glm::vec3 v) {
 	double t0 = ((-1.0 * b) - sqrtf(disc))/(2 * a);
 	double t1 = ((-1.0 * b) + sqrtf(disc))/(2 * a);
 
-	if (t0 > 0.0001) {
+	if (t0 > 0.00001) {
 		glm::vec3 intrs = p + (((float) t0) * v);
-		if (intrs.y < 3.0 && intrs.y > 0.0) {
+		if (intrs.y < 0.5 && intrs.y > -0.5) {
 			return t0;
 		}
 		return -1;
 	}
-	if (t1 > 0.0001) {
+	if (t1 > 0.00001) {
 		glm::vec3 intrs = p + (((float) t1) * v);
-		if (intrs.y < 3.0 && intrs.y > 0.0) {
+		if (intrs.y < 0.5 && intrs.y > -0.5) {
 			return t1;
 		}
 		return -1;
@@ -188,14 +188,14 @@ double CylinderWallIntersect (glm::vec3 p, glm::vec3 v) {
 }
 
 double CylinderCapIntersect(glm::vec3 p, glm::vec3 v, bool top) {
-	int i = 1;
+	float i = 0.5f;
 	if (!top) {
-		i = -1;
+		i = -0.5f;
 	}
-	glm::vec3 p1(0.0f, 0.5 * i, 0.0f);
+	glm::vec3 p1(0.0f, i, 0.0f);
 	glm::vec3 norm(0.0f, 1.0f, 0.0f);
 	double denom = glm::dot(norm, v);
-	if (denom > -0.001 && denom < 0.001) {
+	if (denom > -0.00001 && denom < 0.00001) {
 		return -1;
 	}
 	double t = glm::dot(norm, (p1 - p))/denom;

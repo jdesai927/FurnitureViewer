@@ -18,7 +18,7 @@ void setVert(float* ret, int* ind, glm::vec3 p) {
 */
 
 float* Prism::generateVBO(float eX, float eY, float eZ, glm::vec4 c) {
-	float* ret = new float[96];
+	float* ret = new float[144];
 	int* ind = new int(0);
 	float x1 = c.x;
 	float y1 = c.y;
@@ -45,30 +45,42 @@ float* Prism::generateVBO(float eX, float eY, float eZ, glm::vec4 c) {
 	
 	setVert(ret, ind, v3); //front
 	setVert(ret, ind, v2);
+	setVert(ret, ind, v0);
+	setVert(ret, ind, v2);
 	setVert(ret, ind, v1);
 	setVert(ret, ind, v0);
 
 	setVert(ret, ind, v5); //left
+	setVert(ret, ind, v0);
+	setVert(ret, ind, v6);
 	setVert(ret, ind, v0);
 	setVert(ret, ind, v1);
 	setVert(ret, ind, v6);
 
 	setVert(ret, ind, v3); //right
 	setVert(ret, ind, v4);
+	setVert(ret, ind, v2);
+	setVert(ret, ind, v4);
 	setVert(ret, ind, v7);
 	setVert(ret, ind, v2);
 
 	setVert(ret, ind, v2); //top
+	setVert(ret, ind, v1);
+	setVert(ret, ind, v7);
 	setVert(ret, ind, v1);
 	setVert(ret, ind, v6);
 	setVert(ret, ind, v7);
 
 	setVert(ret, ind, v4); //bottom
 	setVert(ret, ind, v5);
+	setVert(ret, ind, v3);
+	setVert(ret, ind, v5);
 	setVert(ret, ind, v0);
 	setVert(ret, ind, v3);
 
 	setVert(ret, ind, v4); //back
+	setVert(ret, ind, v5);
+	setVert(ret, ind, v7);
 	setVert(ret, ind, v5);
 	setVert(ret, ind, v6);
 	setVert(ret, ind, v7);
@@ -89,19 +101,22 @@ void setInd(short int* ret, short int v0, short int v1, short int v2, short int 
 
 short int* Prism::generateIBO() {
 	short int* ret = new short int[36];
-	int* ind = new int(0);
+	for (int i = 0; i < 36; i++) {
+		ret[i] = i;
+	}
+	/*int* ind = new int(0);
 	int i = 0;
 	while (*ind < 36) {
 		setInd(ret, i, i + 1, i + 2, i + 3, ind);
 		i += 4;
 	}
-	delete ind;
+	delete ind;*/
 	return ret;
 }
 
 float* Prism::generateCBO(int colInt) {
-	float* ret = new float[72];
-	for (int i = 0; i < 72; i++) {
+	float* ret = new float[108];
+	for (int i = 0; i < 108; i++) {
 		if ((i + colInt) % 3 == 0) {
 			ret[i] = 0.8f;
 		} else {
@@ -112,7 +127,7 @@ float* Prism::generateCBO(int colInt) {
 }
 
 float* Prism::generateNBO() {
-	float* norms = new float[96];
+	float* norms = new float[144];
 	
 	glm::vec3 vec1;
 	glm::vec3 vec2;
@@ -132,37 +147,37 @@ float* Prism::generateNBO() {
 	}
 	*/
 	
-	for (int i = 0; i < 16; i += 4) {
+	for (int i = 0; i < 24; i += 4) {
 		norms[i]     = 0.0f;//0.0f;
 		norms[i + 1] = 0.0f;//0.0f;
 		norms[i + 2] = 1.0f;//-1.0f;
 		norms[i + 3] = 0.0f;
 	}
-	for (int i = 16; i < 32; i += 4) {
+	for (int i = 24; i < 48; i += 4) {
 		norms[i]     = 1.0f; //right
 		norms[i + 1] = 0.0f;
 		norms[i + 2] = 0.0f;
 		norms[i + 3] = 0.0f;
 	}
-	for (int i = 32; i < 48; i += 4) {
+	for (int i = 48; i < 72; i += 4) {
 		norms[i]     = -1.0f; //left
 		norms[i + 1] = 0.0f;
 		norms[i + 2] = 0.0f;
 		norms[i + 3] = 0.0f;
 	}
-	for (int i = 48; i < 64; i += 4) {
+	for (int i = 72; i < 96; i += 4) {
 		norms[i]     = 0.0f; //top
 		norms[i + 1] = 1.0f;
 		norms[i + 2] = 0.0f;
 		norms[i + 3] = 0.0f;
 	}
-	for (int i = 64; i < 80; i += 4) {
+	for (int i = 96; i < 120; i += 4) {
 		norms[i]     = 0.0f; //bottom
 		norms[i + 1] = -1.0f;
 		norms[i + 2] = 0.0f;
 		norms[i + 3] = 0.0f;
 	}
-	for (int i = 80; i < 96; i += 4) {
+	for (int i = 120; i < 144; i += 4) {
 		norms[i]     = 0.0f; //back
 		norms[i + 1] = 0.0f;
 		norms[i + 2] = -1.0f;
@@ -177,8 +192,8 @@ Prism::Prism(int colInt, float edgeLengthX, float edgeLengthY, float edgeLengthZ
 	ibo = generateIBO();
 	cbo = generateCBO(colInt);
 	nbo = generateNBO();
-	numVbo = new int(96);
-	numCbo = new int(72);
+	numVbo = new int(144);
+	numCbo = new int(108);
 	numIbo = new int(36);
 }
 
