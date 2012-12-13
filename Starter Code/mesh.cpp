@@ -147,7 +147,7 @@ Mesh::Mesh(int m, float length, int numVerts, std::vector<glm::vec3> verts) : Pr
 			vbo[k + 8] = v3.x;
 			vbo[k + 9] = v3.y + morey;
 			vbo[k + 10] = v3.z;
-			vbo[k + 11] = 1.0f;
+			vbo[k + 11] = 1.0f;	
 			k += 12;
 		}
 		for (int i = 1; i < numVerts - 1; i++) {

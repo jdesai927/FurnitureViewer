@@ -549,6 +549,9 @@ void DisplayClass::traceRay(glm::vec3* color, int depth, glm::vec3 P, glm::vec3 
 	}
 
 	glm::vec3 N = glm::normalize(*n->normal); //compute normal at intersection point
+	//if (N.x < 0.0001f && N.x > -0.0001f && N.y < 0.0001f && N.y > -0.0001f && N.z < 1.0001f && N.z > 0.9999f) {
+	//	std::cout << "Noisy!" << std::endl;
+	//}
 	glm::vec3 Rd = glm::normalize(glm::reflect(V, N)); //compute reflected ray direction
 	float RI = mt[6];
 	glm::vec3 Rfn = N;
@@ -557,7 +560,7 @@ void DisplayClass::traceRay(glm::vec3* color, int depth, glm::vec3 P, glm::vec3 
 	glm::vec3 spec(0.0f, 0.0f, 0.0f);
 	if (mt[4] > 0.0f) {
 		glm::vec3* reflectedColor = new glm::vec3();
-		traceRay(reflectedColor, depth + 1, intersection + 0.001f * Rd, Rd, currentRI, oldRI, lcol);//glm::vec3(lcol.x * mt[0], lcol.y * mt[1], lcol.z * mt[2]));
+		traceRay(reflectedColor, depth + 1, intersection + 0.001f * Rd, Rd, currentRI, oldRI, glm::vec3(lcol.x * mt[0], lcol.y * mt[1], lcol.z * mt[2]));
 		spec = *reflectedColor;
 		delete reflectedColor;
 	}
@@ -580,7 +583,7 @@ void DisplayClass::traceRay(glm::vec3* color, int depth, glm::vec3 P, glm::vec3 
 		float eta = currentRI/oldRI;
 		Rf = glm::normalize(glm::refract(V, Rfn, eta));
 		glm::vec3* refractedColor = new glm::vec3();
-		traceRay(refractedColor, depth + 1, intersection + 0.001f * Rf, Rf, oldRI, currentRI, lcol);
+		traceRay(refractedColor, depth + 1, intersection + 0.001f * Rf, Rf, oldRI, currentRI, glm::vec3(lcol.x * mt[0], lcol.y * mt[1], lcol.z * mt[2]));
 		refr = *refractedColor;
 		delete refractedColor;
 	}
@@ -590,12 +593,13 @@ void DisplayClass::traceRay(glm::vec3* color, int depth, glm::vec3 P, glm::vec3 
 	color->y = rayAmbientCol->y * mt[1];
 	color->z = rayAmbientCol->z * mt[2];
 
-	*color = *color * 0.2f;
+	//*color = *color * 0.2f;
 
-	*color = glm::clamp(*color + refr, 0.0f, 1.0f);
+	*color = glm::clamp(*color, 0.0f, 1.0f);
 	
 	if (mt[5] > 0.0f) {
-		*color = ((1.0f - mt[4]) * *color) + (mt[4] * spec);
+		*color = *color + refr;
+		*color = ((1.0f - mt[4]) * glm::clamp(*color, 0.0f, 1.0f)) + (mt[4] * glm::clamp(spec, 0.0f, 1.0f));
 		/*float cosT = glm::dot(Rf, V); //2.0f * glm::dot(-1.0f * Rfn, V);
 		float rcoef = glm::clamp(pow(1.0f - cosT, 5), 0.0f, 1.0f);
 		*color = glm::clamp(((1.0f - rcoef) * *color) + (rcoef * tcol), 0.0f, 1.0f);*/
@@ -605,7 +609,9 @@ void DisplayClass::traceRay(glm::vec3* color, int depth, glm::vec3 P, glm::vec3 
 	//light ray
 	glm::vec3 L;
 	glm::vec3 R;
-	
+	glm::vec3 finalCol;
+	glm::vec3 ambientCol = *color;
+	glm::vec3 totalCol(0.0f, 0.0f, 0.0f);
 	for (int lc = 0; lc < 3; lc++) {
 		L = glm::normalize(*rayLightPos->at(lc) - intersection);
 		R = glm::reflect(-1.0f * L, N);
@@ -618,7 +624,7 @@ void DisplayClass::traceRay(glm::vec3* color, int depth, glm::vec3 P, glm::vec3 
 		}
 		float di = glm::length(blockob - intersection);
 		//if not shadowed, add more color
-		if (blocker == NULL || (di < 0.00001f && di > -0.00001f)) {
+		if (blocker == NULL || (di < 0.0001f && di > -0.0001f)) {
 
 			//diffuse color
 			glm::vec3 diffuseColor = glm::clamp(glm::vec3(mt[0] * rayLightCol->at(lc)->x, mt[1] * rayLightCol->at(lc)->y, mt[2] * rayLightCol->at(lc)->z), 0.0f, 1.0f);
@@ -631,12 +637,13 @@ void DisplayClass::traceRay(glm::vec3* color, int depth, glm::vec3 P, glm::vec3 
 
 			//final color weighted calculation
 			//blinn-phong
-			*color = *color + (diffuseTerm * diffuseColor * 0.6f) + (glm::clamp(spec + specTerm * *rayLightCol->at(lc), 0.0f, 1.0f) * 0.2f);
-
+			finalCol = ambientCol + (glm::clamp(diffuseTerm * diffuseColor, 0.0f, 1.0f) * 0.6f) + (glm::clamp(spec + specTerm * *rayLightCol->at(lc), 0.0f, 1.0f) * 0.2f);
+			totalCol = totalCol + finalCol;
+			*color = totalCol;
 		}
 	}
 	//reflectivity-weighted
-	*color = ((1.0f - mt[4]) * *color) + (mt[4] * spec);
+	*color = ((1.0f - mt[4]) * glm::clamp(*color, 0.0f, 1.0f)) + (mt[4] * glm::clamp(spec, 0.0f, 1.0f));
 
 }
 
@@ -676,8 +683,9 @@ void DisplayClass::doRayTrace() {
 			delete color;
 			color = 0;
 		}
-
-		std::cout << "finished vertical line: " << x << std::endl;
+		if (x % 10 == 0) {
+			std::cout << "finished vertical line: " << x << std::endl;
+		}
 	}
 	std::cout << "Finished raytrace!" << std::endl;
 	output.WriteToFile(rayOutputFile->c_str());

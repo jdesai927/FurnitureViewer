@@ -8,7 +8,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <QTDIR>D:\Qt\4.8.1</QTDIR>
-    <LocalDebuggerCommandArguments Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"HW5_scene.txt" "raytracer_config_sample.txt"</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"HW5_scene2.txt" "raytracer_config_sample.txt"</LocalDebuggerCommandArguments>
     <DebuggerFlavor Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
 </Project>

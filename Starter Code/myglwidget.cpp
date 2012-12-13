@@ -136,11 +136,11 @@ void MyGLWidget::initializeGL() {
 	}
 
 	displayClass->mtlf = new float[8];
-	displayClass->mtlf[0] = 1.0f;
-	displayClass->mtlf[1] = 1.0f;
-	displayClass->mtlf[2] = 1.0f;
+	displayClass->mtlf[0] = 0.5f;
+	displayClass->mtlf[1] = 0.5f;
+	displayClass->mtlf[2] = 0.0f;
 	displayClass->mtlf[3] = 5.0f;
-	displayClass->mtlf[4] = 0.8f;
+	displayClass->mtlf[4] = 0.0f;
 	displayClass->mtlf[5] = 0.0f;
 	displayClass->mtlf[6] = 0.0f;
 	displayClass->mtlf[7] = 0.0f;
@@ -172,7 +172,7 @@ void MyGLWidget::initializeGL() {
 	sg->rootNode = new Node(displayClass->floor, NULL, NULL, 0, 0);
 	*sg->rootNode->mtl = 4;
 	sg->rootNode->scale = new glm::mat4();//glm::scale(glm::mat4(), glm::vec3(xSize, 0.1f, zSize)));
-	sg->rootNode->rotate = new glm::mat4();
+	sg->rootNode->rotate = new glm::mat4();//glm::rotate(glm::mat4(), 0.1f, glm::vec3(0.0f, 1.0f, 0.0f)));
 	sg->rootNode->translate = new glm::mat4();
 	Furniture* currentPrimitive = NULL;
 	Node* par;
